@@ -1,6 +1,6 @@
 const API_KEY = '488eb36776275b8ae18600751059fb49'; // Replace with your TMDB API key
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-const PROXY_URL = '/api/proxy?id='; // Proxy route on Vercel
+const PROXY_URL = 'https://officialflix.vercel.app/api/proxy?id='; // Proxy route on Vercel
 let timeout = null;
 
 // Categories
