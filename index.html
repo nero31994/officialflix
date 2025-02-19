@@ -11,9 +11,6 @@
         .movie { width: 150px; cursor: pointer; transition: 0.3s; }
         .movie:hover { transform: scale(1.05); }
         .movie img { width: 100%; border-radius: 8px; }
-        #playerContainer { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.8); justify-content: center; align-items: center; }
-        #player { width: 80%; height: 80%; border: none; }
-        #closePlayer { position: absolute; top: 10px; right: 20px; font-size: 24px; cursor: pointer; color: white; }
     </style>
 </head>
 <body>
@@ -21,16 +18,10 @@
     <input type="text" id="search" placeholder="Search movies..." oninput="searchMovies()">
     <div id="movies" class="grid"></div>
 
-    <!-- Movie Player -->
-    <div id="playerContainer">
-        <span id="closePlayer" onclick="closePlayer()">✖</span>
-        <iframe id="player"></iframe>
-    </div>
-
     <script>
-        const API_KEY = '488eb36776275b8ae18600751059fb49'; // TMDB API Key
+        const API_KEY = '488eb36776275b8ae18600751059fb49'; // Replace with your TMDB API key
         const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-        const SUPEREMBED_URL = 'https://superembed.stream/?video_id='; // SuperEmbed API
+        const PROXY_URL = 'https://officialflix.vercel.app/api/proxy?id='; // Replace with your deployed Vercel proxy
 
         async function fetchMovies(url) {
             const res = await fetch(url);
@@ -48,20 +39,9 @@
                     <img src="${IMG_URL}${movie.poster_path}" alt="${movie.title}">
                     <p>${movie.title}</p>
                 `;
-                movieEl.onclick = () => openPlayer(movie.id);
+                movieEl.onclick = () => window.open(`${PROXY_URL}${movie.id}`, "_blank");
                 moviesDiv.appendChild(movieEl);
             });
-        }
-
-        function openPlayer(movieId) {
-            const embedUrl = `${SUPEREMBED_URL}${movieId}&type=movie`;
-            document.getElementById("player").src = embedUrl;
-            document.getElementById("playerContainer").style.display = "flex";
-        }
-
-        function closePlayer() {
-            document.getElementById("playerContainer").style.display = "none";
-            document.getElementById("player").src = "";
         }
 
         function searchMovies() {
