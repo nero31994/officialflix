@@ -3,44 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Hub</title>
+    <title>Movie Site</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
-        <h1>Nero Movie Hub</h1>
-        <input type="text" id="search" placeholder="Search movies...">
+        <h1>Movie Site</h1>
+        <input type="text" id="search" placeholder="Search movies..." oninput="debounceSearch()">
     </header>
-
-    <div class="filters">
-        <select id="type">
-            <option value="movie">Movies</option>
-            <option value="tv">TV Series</option>
-        </select>
-
-        <select id="genre">
-            <option value="">All Genres</option>
-            <option value="28">Action</option>
-            <option value="35">Comedy</option>
-            <option value="16">Animation</option>
-            <option value="10749">Romance</option>
-            <option value="27">Horror</option>
-        </select>
-
-        <select id="sort">
-            <option value="popularity.desc">Most Popular</option>
-            <option value="vote_average.desc">Highest Rated</option>
-            <option value="release_date.desc">Newest First</option>
-        </select>
-    </div>
-
+    
     <p id="loading" class="loading">Loading movies...</p>
-    <p id="error" class="error"></p>
-
+    
     <div id="movies" class="grid"></div>
-
-    <button id="load-more">Load More</button>
-
+    
+    <p id="error" class="error"></p>
+    
     <script src="script.js"></script>
 </body>
 </html>
