@@ -23,10 +23,10 @@ export default async function handler(req, res) {
             </head>
         `);
 
-        // Add security headers
+        // Security headers
         res.setHeader("Content-Type", "text/html");
-        res.setHeader("X-Frame-Options", "DENY"); // Prevent clickjacking
-        res.setHeader("Content-Security-Policy", "default-src 'self'; frame-ancestors 'none';");
+        res.setHeader("X-Frame-Options", "ALLOW-FROM https://officialflix.vercel.app"); // Allow embedding only on your domain
+        res.setHeader("Content-Security-Policy", "frame-ancestors 'self' https://officialflix.vercel.app; default-src 'self';");
 
         res.status(200).send(html);
     } catch (error) {
