@@ -30,7 +30,7 @@
     <script>
         const API_KEY = '488eb36776275b8ae18600751059fb49'; // TMDB API Key
         const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-        const SCRAPER_API = 'https://api.consumet.org/movies/flixhq/';
+        const SUPEREMBED_URL = 'https://superembed.stream/?video_id='; // SuperEmbed API
 
         async function fetchMovies(url) {
             const res = await fetch(url);
@@ -48,38 +48,14 @@
                     <img src="${IMG_URL}${movie.poster_path}" alt="${movie.title}">
                     <p>${movie.title}</p>
                 `;
-                movieEl.onclick = () => fetchMovieLink(movie.title);
+                movieEl.onclick = () => openPlayer(movie.id);
                 moviesDiv.appendChild(movieEl);
             });
         }
 
-        async function fetchMovieLink(movieTitle) {
-            try {
-                const searchUrl = `${SCRAPER_API}search/${encodeURIComponent(movieTitle)}`;
-                const res = await fetch(searchUrl);
-                const data = await res.json();
-                
-                if (data.results.length > 0) {
-                    const movieId = data.results[0].id;
-                    const movieDetails = await fetch(`${SCRAPER_API}info?id=${movieId}`);
-                    const movieData = await movieDetails.json();
-
-                    if (movieData.episodes.length > 0) {
-                        const streamUrl = movieData.episodes[0].url;
-                        openPlayer(streamUrl);
-                    } else {
-                        alert("No streaming link found!");
-                    }
-                } else {
-                    alert("Movie not found!");
-                }
-            } catch (error) {
-                alert("Error fetching movie link.");
-            }
-        }
-
-        function openPlayer(url) {
-            document.getElementById("player").src = url;
+        function openPlayer(movieId) {
+            const embedUrl = `${SUPEREMBED_URL}${movieId}&type=movie`;
+            document.getElementById("player").src = embedUrl;
             document.getElementById("playerContainer").style.display = "flex";
         }
 
