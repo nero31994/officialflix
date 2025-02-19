@@ -27,7 +27,7 @@ export default async function handler(req, res) {
                     </style>
                 </head>
                 <body>
-                    <iframe src="${embedUrl}" allowfullscreen></iframe>
+                    <iframe src="${embedUrl}" autofullscreen></iframe>
                 </body>
                 </html>
             `);
