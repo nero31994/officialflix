@@ -76,8 +76,8 @@
     </style>
 </head>
 <body>
-    <h1>Movie Site</h1>
-    
+    <h1>Movie Streaming</h1>
+
     <select id="type" onchange="loadByType()">
         <option value="movie">Movies</option>
         <option value="tv">TV Shows</option>
@@ -90,124 +90,80 @@
         <option value="now_playing">Now Playing</option>
     </select>
 
-    <select id="sort" onchange="loadBySort()">
-        <option value="popularity.desc">Most Popular</option>
-        <option value="vote_average.desc">Highest Rated</option>
-        <option value="release_date.desc">Newest</option>
-        <option value="release_date.asc">Oldest</option>
-    </select>
-
-    <input type="text" id="search" placeholder="Search movies..." oninput="debounceSearch()">
+    <input type="text" id="search" placeholder="Search..." oninput="debounceSearch()">
     
-    <p id="loading" class="loading">Loading movies...</p>
+    <p id="loading" class="loading">Loading...</p>
     <div id="movies" class="grid"></div>
     <p id="error" class="error"></p>
 
     <script>
         const API_KEY = '488eb36776275b8ae18600751059fb49';
         const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-        let currentPage = 1;
-        let currentUrl = '';
-
-        window.onload = () => {
-            loadByType();
-        };
-
-        function loadByType() {
-            document.getElementById("category").value = "popular";
-            document.getElementById("sort").value = "popularity.desc";
-            loadByCategory();
-        }
-
-        function loadByCategory() {
-            const type = document.getElementById("type").value;
-            const category = document.getElementById("category").value;
-            currentPage = 1;
-            fetchMovies(`https://api.themoviedb.org/3/${type}/${category}?api_key=${API_KEY}`);
-        }
-
-        function loadBySort() {
-            const type = document.getElementById("type").value;
-            const sort = document.getElementById("sort").value;
-            currentPage = 1;
-            fetchMovies(`https://api.themoviedb.org/3/discover/${type}?api_key=${API_KEY}&sort_by=${sort}`);
-        }
+        const PROXY_URL = 'http://localhost:3000/api/proxy?id='; // Your proxy URL
 
         async function fetchMovies(url) {
             document.getElementById("loading").style.display = "block";
-            document.getElementById("movies").innerHTML = "";
-            currentUrl = url + `&page=${currentPage}`;
-
             try {
-                const res = await fetch(currentUrl);
+                const res = await fetch(url);
                 const data = await res.json();
                 document.getElementById("loading").style.display = "none";
 
                 if (!data.results || data.results.length === 0) {
-                    document.getElementById("error").innerText = "No results found!";
+                    document.getElementById("error").innerText = "No movies found!";
+                    document.getElementById("movies").innerHTML = "";
                     return;
                 }
 
                 document.getElementById("error").innerText = "";
                 displayMovies(data.results);
             } catch (err) {
-                document.getElementById("error").innerText = "Error fetching data!";
+                document.getElementById("error").innerText = "Error fetching movies!";
                 document.getElementById("loading").style.display = "none";
             }
         }
 
-        function displayMovies(results) {
+        function displayMovies(movies) {
             const moviesDiv = document.getElementById("movies");
+            moviesDiv.innerHTML = "";
 
-            results.forEach(item => {
-                if (!item.poster_path) return;
+            movies.forEach(movie => {
+                if (!movie.poster_path) return;
 
                 const movieEl = document.createElement("div");
                 movieEl.classList.add("movie");
                 movieEl.innerHTML = `
-                    <img src="${IMG_URL}${item.poster_path}" alt="${item.title || item.name}" loading="lazy">
-                    <div class="overlay">${item.title || item.name}</div>
+                    <img src="${IMG_URL}${movie.poster_path}" alt="${movie.title}" loading="lazy">
+                    <div class="overlay">${movie.title}</div>
                 `;
-                movieEl.onclick = () => openMovie(item.id);
+                movieEl.onclick = () => window.open(`${PROXY_URL}${movie.id}&type=${document.getElementById("type").value}`, "_blank");
                 moviesDiv.appendChild(movieEl);
             });
         }
 
-        function openMovie(id) {
-            const type = document.getElementById("type").value;
-            const url = `https://www.2embed.stream/embed/${type === 'movie' ? 'movie' : 'series'}?tmdb=${id}`;
-            window.open(url, "_blank");
-        }
-
         function debounceSearch() {
-            clearTimeout(this.searchTimeout);
-            this.searchTimeout = setTimeout(() => {
+            clearTimeout(window.searchTimeout);
+            window.searchTimeout = setTimeout(() => {
                 const query = document.getElementById("search").value;
                 if (query.length > 2) {
-                    fetchMovies(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${query}`);
+                    fetchMovies(`https://api.themoviedb.org/3/search/${document.getElementById("type").value}?api_key=${API_KEY}&query=${query}`);
                 } else {
                     loadByCategory();
                 }
             }, 300);
         }
 
-        window.addEventListener("scroll", () => {
-            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
-                currentPage++;
-                fetchMoreMovies();
-            }
-        });
-
-        async function fetchMoreMovies() {
-            try {
-                const res = await fetch(currentUrl + `&page=${currentPage}`);
-                const data = await res.json();
-                if (!data.results || data.results.length === 0) return;
-                displayMovies(data.results);
-            } catch (err) {
-                console.error("Error loading more movies:", err);
-            }
+        function loadByType() {
+            loadByCategory();
         }
+
+        function loadByCategory() {
+            const type = document.getElementById("type").value;
+            const category = document.getElementById("category").value;
+            fetchMovies(`https://api.themoviedb.org/3/${type}/${category}?api_key=${API_KEY}`);
+        }
+
+        // Load default movies
+        loadByCategory();
     </script>
 </body>
 </html>
