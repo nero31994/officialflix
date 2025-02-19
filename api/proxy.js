@@ -5,13 +5,13 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: "Invalid Movie ID" });
     }
 
-    const vidSrcUrl = `https://www.2embed.stream/embed/movie/${id}`;
+    const embedUrl = `https://www.2embed.stream/embed/movie/${id}`;
 
     try {
-        const response = await fetch(vidSrcUrl);
+        const response = await fetch(embedUrl);
         let html = await response.text();
 
-        // Remove scripts, disable pop-ups & redirects
+        // Remove scripts, popups, and forced redirects
         html = html
             .replace(/<script[^>]*>.*?<\/script>/gis, '') // Remove scripts
             .replace(/window\.open/g, 'console.log') // Disable pop-ups
@@ -21,12 +21,13 @@ export default async function handler(req, res) {
         html = html.replace("</head>", `
             <style>
                 body { background: #000 !important; margin: 0; }
-                iframe { pointer-events: auto !important; }
+                .overlay { display: none !important; }
             </style>
         </head>`);
 
-        res.send(html);
+        res.setHeader("Content-Type", "text/html");
+        res.status(200).send(html);
     } catch (error) {
-        res.status(500).json({ error: "Failed to fetch movie." });
+        res.status(500).json({ error: "Error fetching movie embed." });
     }
 }
