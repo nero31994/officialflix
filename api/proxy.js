@@ -1,37 +1,32 @@
-const express = require('express');
-const fetch = require('node-fetch');
-const cors = require('cors');
+export default async function handler(req, res) {
+    const { id } = req.query;
 
-const app = express();
-app.use(cors());
-
-app.get('/api/proxy', async (req, res) => {
-    const { id, type } = req.query;
-
-    if (!id || !type) {
-        return res.status(400).json({ error: "Missing parameters (id or type)" });
+    if (!id || isNaN(id)) {
+        return res.status(400).json({ error: "Invalid Movie ID" });
     }
 
-    const embedURL = type === 'movie' 
-        ? `https://www.2embed.stream/embed/movie/${id}` 
-        : `https://www.2embed.stream/embed/tv/${id}`;
+    const vidSrcUrl = `https://www.2embed.stream/embed/movie/${id}`;
 
     try {
-        const response = await fetch(embedURL);
+        const response = await fetch(vidSrcUrl);
         let html = await response.text();
 
-        // Remove all scripts (to block pop-ups & ads)
-        html = html.replace(/<script[^>]*>.*?<\/script>/gis, '');
+        // Remove scripts, disable pop-ups & redirects
+        html = html
+            .replace(/<script[^>]*>.*?<\/script>/gis, '') // Remove scripts
+            .replace(/window\.open/g, 'console.log') // Disable pop-ups
+            .replace(/location\.href/g, 'console.log'); // Disable redirects
 
-        // Prevent forced redirects
-        html = html.replace(/window\.open/g, 'console.log');
-        html = html.replace(/location\.href/g, 'console.log');
+        // Prevent overlay click hijacking
+        html = html.replace("</head>", `
+            <style>
+                body { background: #000 !important; margin: 0; }
+                iframe { pointer-events: auto !important; }
+            </style>
+        </head>`);
 
         res.send(html);
     } catch (error) {
-        res.status(500).json({ error: "Failed to fetch the stream" });
+        res.status(500).json({ error: "Failed to fetch movie." });
     }
-});
-
-const PORT = 3000;
-app.listen(PORT, () => console.log(`Proxy running on http://localhost:${PORT}`));
+}
