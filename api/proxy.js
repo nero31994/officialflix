@@ -12,12 +12,20 @@ module.exports = async (req, res) => {
         const response = await fetch(vidSrcUrl);
         const html = await response.text();
 
-        // Extract the direct video URL from the HTML
-        const regex = /file: "(https:\/\/[^"]+\.m3u8)"/;
-        const match = html.match(regex);
+        // Extract the iFrame URL
+        const iframeRegex = /<iframe[^>]+src="([^"]+)"/;
+        const match = html.match(iframeRegex);
 
         if (match && match[1]) {
-            const videoUrl = match[1];
-            res.json({ videoUrl });
+            const iframeUrl = match[1];
+
+            // Return the iFrame URL (no ads)
+            res.json({ iframeUrl });
         } else {
-            res.status0
+            res.status(500).json({ error: "Failed to extract video iframe" });
+        }
+    } catch (error) {
+        console.error("Error fetching VidSrc:", error);
+        res.status(500).json({ error: "Failed to fetch video" });
+    }
+};
