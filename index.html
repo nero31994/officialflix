@@ -17,16 +17,15 @@
             font-size: 24px;
             margin: 20px 0;
         }
-        #search {
+        select, input {
             width: 90%;
-            max-width: 500px;
-            padding: 12px;
+            max-width: 300px;
+            padding: 10px;
             font-size: 16px;
             border-radius: 5px;
             border: none;
             outline: none;
-            margin: 20px 0;
-            box-shadow: 0px 0px 8px rgba(255, 255, 255, 0.2);
+            margin: 10px 5px;
         }
         .grid {
             display: grid;
@@ -78,70 +77,137 @@
 </head>
 <body>
     <h1>Movie Site</h1>
+    
+    <select id="type" onchange="loadByType()">
+        <option value="movie">Movies</option>
+        <option value="tv">TV Shows</option>
+    </select>
+
+    <select id="category" onchange="loadByCategory()">
+        <option value="popular">Popular</option>
+        <option value="top_rated">Top Rated</option>
+        <option value="upcoming">Upcoming</option>
+        <option value="now_playing">Now Playing</option>
+    </select>
+
+    <select id="sort" onchange="loadBySort()">
+        <option value="popularity.desc">Most Popular</option>
+        <option value="vote_average.desc">Highest Rated</option>
+        <option value="release_date.desc">Newest</option>
+        <option value="release_date.asc">Oldest</option>
+    </select>
+
     <input type="text" id="search" placeholder="Search movies..." oninput="debounceSearch()">
+    
     <p id="loading" class="loading">Loading movies...</p>
     <div id="movies" class="grid"></div>
     <p id="error" class="error"></p>
 
     <script>
-        const API_KEY = '488eb36776275b8ae18600751059fb49'; // Replace with your TMDB API key
+        const API_KEY = '488eb36776275b8ae18600751059fb49';
         const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-        const PROXY_URL = 'https://officialflix.vercel.app/api/proxy?id='; // Your proxy URL
-        let timeout = null;
+        let currentPage = 1;
+        let currentUrl = '';
+
+        window.onload = () => {
+            loadByType();
+        };
+
+        function loadByType() {
+            document.getElementById("category").value = "popular";
+            document.getElementById("sort").value = "popularity.desc";
+            loadByCategory();
+        }
+
+        function loadByCategory() {
+            const type = document.getElementById("type").value;
+            const category = document.getElementById("category").value;
+            currentPage = 1;
+            fetchMovies(`https://api.themoviedb.org/3/${type}/${category}?api_key=${API_KEY}`);
+        }
+
+        function loadBySort() {
+            const type = document.getElementById("type").value;
+            const sort = document.getElementById("sort").value;
+            currentPage = 1;
+            fetchMovies(`https://api.themoviedb.org/3/discover/${type}?api_key=${API_KEY}&sort_by=${sort}`);
+        }
 
         async function fetchMovies(url) {
             document.getElementById("loading").style.display = "block";
+            document.getElementById("movies").innerHTML = "";
+            currentUrl = url + `&page=${currentPage}`;
+
             try {
-                const res = await fetch(url);
+                const res = await fetch(currentUrl);
                 const data = await res.json();
                 document.getElementById("loading").style.display = "none";
 
                 if (!data.results || data.results.length === 0) {
-                    document.getElementById("error").innerText = "No movies found!";
-                    document.getElementById("movies").innerHTML = "";
+                    document.getElementById("error").innerText = "No results found!";
                     return;
                 }
 
                 document.getElementById("error").innerText = "";
                 displayMovies(data.results);
             } catch (err) {
-                document.getElementById("error").innerText = "Error fetching movies!";
+                document.getElementById("error").innerText = "Error fetching data!";
                 document.getElementById("loading").style.display = "none";
             }
         }
 
-        function displayMovies(movies) {
+        function displayMovies(results) {
             const moviesDiv = document.getElementById("movies");
-            moviesDiv.innerHTML = "";
 
-            movies.forEach(movie => {
-                if (!movie.poster_path) return; // Skip movies without posters
-                
+            results.forEach(item => {
+                if (!item.poster_path) return;
+
                 const movieEl = document.createElement("div");
                 movieEl.classList.add("movie");
                 movieEl.innerHTML = `
-                    <img src="${IMG_URL}${movie.poster_path}" alt="${movie.title}" loading="lazy">
-                    <div class="overlay">${movie.title}</div>
+                    <img src="${IMG_URL}${item.poster_path}" alt="${item.title || item.name}" loading="lazy">
+                    <div class="overlay">${item.title || item.name}</div>
                 `;
-                movieEl.onclick = () => window.open(`${PROXY_URL}${movie.id}`, "_blank");
+                movieEl.onclick = () => openMovie(item.id);
                 moviesDiv.appendChild(movieEl);
             });
         }
 
+        function openMovie(id) {
+            const type = document.getElementById("type").value;
+            const url = `https://www.2embed.stream/embed/${type === 'movie' ? 'movie' : 'series'}?tmdb=${id}`;
+            window.open(url, "_blank");
+        }
+
         function debounceSearch() {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
+            clearTimeout(this.searchTimeout);
+            this.searchTimeout = setTimeout(() => {
                 const query = document.getElementById("search").value;
                 if (query.length > 2) {
                     fetchMovies(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${query}`);
                 } else {
-                    fetchMovies(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`);
+                    loadByCategory();
                 }
-            }, 300); // Reduced debounce time for better UX
+            }, 300);
         }
 
-        // Load popular movies on page load
-        fetchMovies(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`);
+        window.addEventListener("scroll", () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+                currentPage++;
+                fetchMoreMovies();
+            }
+        });
+
+        async function fetchMoreMovies() {
+            try {
+                const res = await fetch(currentUrl + `&page=${currentPage}`);
+                const data = await res.json();
+                if (!data.results || data.results.length === 0) return;
+                displayMovies(data.results);
+            } catch (err) {
+                console.error("Error loading more movies:", err);
+            }
+        }
     </script>
 </body>
 </html>
