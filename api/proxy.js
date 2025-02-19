@@ -14,7 +14,7 @@ export default async function handler(req, res) {
             .replace(/window\.open/g, '') // Block pop-ups
             .replace(/location\.href/g, ''); // Block redirects
 
-        // Inject custom CSS to fix fullscreen video player
+        // Inject custom CSS for fullscreen video
         html = html.replace("</head>", `
             <style>
                 body { background: #000 !important; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
@@ -23,7 +23,11 @@ export default async function handler(req, res) {
             </head>
         `);
 
+        // Add security headers
         res.setHeader("Content-Type", "text/html");
+        res.setHeader("X-Frame-Options", "DENY"); // Prevent clickjacking
+        res.setHeader("Content-Security-Policy", "default-src 'self'; frame-ancestors 'none';");
+
         res.status(200).send(html);
     } catch (error) {
         res.status(500).json({ error: "Failed to fetch video" });
