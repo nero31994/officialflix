@@ -1,58 +1,33 @@
-const API_KEY = '488eb36776275b8ae18600751059fb49'; // Replace with your TMDB API key
-const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-const PROXY_URL = '/api/proxy?id='; // Proxy route on Vercel
-let timeout = null;
+export default async function handler(req, res) {
+    const { id } = req.query;
 
-async function fetchMovies(url) {
-    document.getElementById("loading").style.display = "block";
+    if (!id || isNaN(id)) {
+        return res.status(400).json({ error: "Invalid Movie ID" });
+    }
+
+    const embedUrl = `https://www.2embed.stream/embed/movie/${id}`;
+
     try {
-        const res = await fetch(url);
-        const data = await res.json();
-        document.getElementById("loading").style.display = "none";
+        const response = await fetch(embedUrl);
+        let html = await response.text();
 
-        if (!data.results || data.results.length === 0) {
-            document.getElementById("error").innerText = "No movies found!";
-            document.getElementById("movies").innerHTML = "";
-            return;
-        }
+        // Remove scripts, popups, and forced redirects
+        html = html
+            .replace(/<script[^>]*>.*?<\/script>/gis, '') // Remove scripts
+            .replace(/window\.open/g, 'console.log') // Disable pop-ups
+            .replace(/location\.href/g, 'console.log'); // Disable redirects
 
-        document.getElementById("error").innerText = "";
-        displayMovies(data.results);
-    } catch (err) {
-        document.getElementById("error").innerText = "Error fetching movies!";
-        document.getElementById("loading").style.display = "none";
+        // Prevent overlay click hijacking
+        html = html.replace("</head>", `
+            <style>
+                body { background: #000 !important; margin: 0; }
+                .overlay { display: none !important; }
+            </style>
+        </head>`);
+
+        res.setHeader("Content-Type", "text/html");
+        res.status(200).send(html);
+    } catch (error) {
+        res.status(500).json({ error: "Error fetching movie embed." });
     }
 }
-
-function displayMovies(movies) {
-    const moviesDiv = document.getElementById("movies");
-    moviesDiv.innerHTML = "";
-
-    movies.forEach(movie => {
-        if (!movie.poster_path) return; // Skip movies without posters
-            
-        const movieEl = document.createElement("div");
-        movieEl.classList.add("movie");
-        movieEl.innerHTML = `
-            <img src="${IMG_URL}${movie.poster_path}" alt="${movie.title}" loading="lazy">
-            <div class="overlay">${movie.title}</div>
-        `;
-        movieEl.onclick = () => window.open(`${PROXY_URL}${movie.id}`, "_blank");
-        moviesDiv.appendChild(movieEl);
-    });
-}
-
-function debounceSearch() {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => {
-        const query = document.getElementById("search").value;
-        if (query.length > 2) {
-            fetchMovies(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${query}`);
-        } else {
-            fetchMovies(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`);
-        }
-    }, 300);
-}
-
-// Load popular movies on page load
-fetchMovies(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`); 
