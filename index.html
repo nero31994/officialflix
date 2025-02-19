@@ -21,7 +21,6 @@
     <script>
         const API_KEY = '488eb36776275b8ae18600751059fb49'; // Replace with your TMDB API key
         const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-        const PROXY_URL = 'https://officialflix.vercel.app/api/proxy?id='; // Replace with your deployed Vercel proxy
 
         async function fetchMovies(url) {
             const res = await fetch(url);
@@ -39,33 +38,20 @@
                     <img src="${IMG_URL}${movie.poster_path}" alt="${movie.title}">
                     <p>${movie.title}</p>
                 `;
-                movieEl.onclick = () => openPlayer(movie.id);
+                movieEl.onclick = () => openPlayer(movie.title);
                 moviesDiv.appendChild(movieEl);
             });
         }
 
-        function openPlayer(movieId) {
-            const playerUrl = `${PROXY_URL}${movieId}`;
-            const win = window.open("", "_blank", "width=800,height=600");
+        function openPlayer(movieTitle) {
+            const slug = movieTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+            const playerUrl = `https://uflix.to/movie/${slug}`;
 
-            // Inject an iframe into the new window
-            win.document.write(`
-                <!DOCTYPE html>
-                <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Movie Player</title>
-                    <style>
-                        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: black; }
-                        iframe { width: 100vw; height: 100vh; border: none; }
-                    </style>
-                </head>
-                <body>
-                    <iframe src="${playerUrl}" allowfullscreen></iframe>
-                </body>
-                </html>
-            `);
+            // Open a resizable pop-up window
+            const win = window.open(playerUrl, "_blank", "width=900,height=500,resizable=yes,scrollbars=no");
+
+            // If blocked, open in the same tab as fallback
+            if (!win) window.location.href = playerUrl;
         }
 
         function searchMovies() {
