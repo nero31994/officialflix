@@ -23,13 +23,11 @@ export default async function handler(req, res) {
             </head>
         `);
 
-        // Security headers (Allow only your domain)
+        // Security headers (No iframe restrictions now)
         res.setHeader("Content-Type", "text/html");
-        res.setHeader("Access-Control-Allow-Origin", "https://officialflix.vercel.app"); // Allow CORS only from your site
+        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins for testing
         res.setHeader("Access-Control-Allow-Methods", "GET");
-        res.setHeader("X-Frame-Options", "SAMEORIGIN"); // Allow embedding only on the same domain
-        res.setHeader("Content-Security-Policy", "frame-ancestors 'self' https://officialflix.vercel.app; default-src 'self' https://vidsrc.me;");
-
+        
         res.status(200).send(html);
     } catch (error) {
         res.status(500).json({ error: "Failed to fetch video" });
