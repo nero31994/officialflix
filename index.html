@@ -11,6 +11,9 @@
         .movie { width: 150px; cursor: pointer; transition: 0.3s; }
         .movie:hover { transform: scale(1.05); }
         .movie img { width: 100%; border-radius: 8px; }
+        #playerContainer { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.8); justify-content: center; align-items: center; }
+        #player { width: 80%; height: 80%; border: none; }
+        #closePlayer { position: absolute; top: 10px; right: 20px; font-size: 24px; cursor: pointer; color: white; }
     </style>
 </head>
 <body>
@@ -18,9 +21,16 @@
     <input type="text" id="search" placeholder="Search movies..." oninput="searchMovies()">
     <div id="movies" class="grid"></div>
 
+    <!-- Movie Player -->
+    <div id="playerContainer">
+        <span id="closePlayer" onclick="closePlayer()">✖</span>
+        <iframe id="player"></iframe>
+    </div>
+
     <script>
-        const API_KEY = '488eb36776275b8ae18600751059fb49'; // Replace with your TMDB API key
+        const API_KEY = '488eb36776275b8ae18600751059fb49'; // TMDB API Key
         const IMG_URL = 'https://image.tmdb.org/t/p/w500';
+        const SCRAPER_API = 'https://api.consumet.org/movies/flixhq/';
 
         async function fetchMovies(url) {
             const res = await fetch(url);
@@ -38,20 +48,44 @@
                     <img src="${IMG_URL}${movie.poster_path}" alt="${movie.title}">
                     <p>${movie.title}</p>
                 `;
-                movieEl.onclick = () => openPlayer(movie.title);
+                movieEl.onclick = () => fetchMovieLink(movie.title);
                 moviesDiv.appendChild(movieEl);
             });
         }
 
-        function openPlayer(movieTitle) {
-            const slug = movieTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-            const playerUrl = `https://uflix.to/movie/${slug}`;
+        async function fetchMovieLink(movieTitle) {
+            try {
+                const searchUrl = `${SCRAPER_API}search/${encodeURIComponent(movieTitle)}`;
+                const res = await fetch(searchUrl);
+                const data = await res.json();
+                
+                if (data.results.length > 0) {
+                    const movieId = data.results[0].id;
+                    const movieDetails = await fetch(`${SCRAPER_API}info?id=${movieId}`);
+                    const movieData = await movieDetails.json();
 
-            // Open a resizable pop-up window
-            const win = window.open(playerUrl, "_blank", "width=900,height=500,resizable=yes,scrollbars=no");
+                    if (movieData.episodes.length > 0) {
+                        const streamUrl = movieData.episodes[0].url;
+                        openPlayer(streamUrl);
+                    } else {
+                        alert("No streaming link found!");
+                    }
+                } else {
+                    alert("Movie not found!");
+                }
+            } catch (error) {
+                alert("Error fetching movie link.");
+            }
+        }
 
-            // If blocked, open in the same tab as fallback
-            if (!win) window.location.href = playerUrl;
+        function openPlayer(url) {
+            document.getElementById("player").src = url;
+            document.getElementById("playerContainer").style.display = "flex";
+        }
+
+        function closePlayer() {
+            document.getElementById("playerContainer").style.display = "none";
+            document.getElementById("player").src = "";
         }
 
         function searchMovies() {
