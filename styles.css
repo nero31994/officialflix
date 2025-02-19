@@ -1,9 +1,9 @@
-/* General Styles */
+/* Global Styles */
 body {
     font-family: Arial, sans-serif;
-    background: url('background.jpg') no-repeat center center fixed;
-    background-size: cover;
+    background: rgba(18, 18, 18, 0.8);
     color: white;
+    text-align: center;
     margin: 0;
     padding: 0;
     display: flex;
@@ -11,42 +11,45 @@ body {
     align-items: center;
 }
 
-/* Glassmorphism Effect */
-header {
-    width: 90%;
-    max-width: 600px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border-radius: 15px;
-    padding: 20px;
-    text-align: center;
-    margin: 20px 0;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-/* Search Input */
+/* Search Bar */
 #search {
-    width: 100%;
+    width: 90%;
+    max-width: 500px;
     padding: 12px;
     font-size: 16px;
     border-radius: 10px;
     border: none;
     outline: none;
-    text-align: center;
+    margin: 20px 0;
     background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(5px);
     color: white;
-    box-shadow: inset 0px 0px 10px rgba(255, 255, 255, 0.1);
+    box-shadow: 0px 4px 12px rgba(255, 255, 255, 0.1);
+    transition: 0.3s;
+}
+
+#search:focus {
+    box-shadow: 0px 0px 12px rgba(255, 255, 255, 0.3);
+}
+
+/* Category Titles */
+.category-title {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 20px 0 10px;
+    text-transform: uppercase;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+    padding: 8px 16px;
+    border-radius: 10px;
+    display: inline-block;
 }
 
 /* Movie Grid */
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 20px;
-    padding: 20px;
-    max-width: 1400px;
-    width: 90%;
+    gap: 15px;
+    padding: 10px;
+    max-width: 1200px;
     margin: auto;
 }
 
@@ -54,33 +57,41 @@ header {
 .movie {
     position: relative;
     cursor: pointer;
-    transition: transform 0.3s ease-in-out;
-    overflow: hidden;
     border-radius: 12px;
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.1);
 }
 
 .movie:hover {
     transform: scale(1.08);
+    box-shadow: 0px 4px 15px rgba(255, 255, 255, 0.2);
 }
 
-/* Movie Image */
+/* Movie Images */
 .movie img {
     width: 100%;
-    height: 230px;
+    height: 220px;
     object-fit: cover;
     border-radius: 12px;
+    transition: opacity 0.3s;
 }
 
-/* Overlay */
+.movie:hover img {
+    opacity: 0.7;
+}
+
+/* Overlay Title */
 .movie .overlay {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.7);
     color: white;
-    padding: 10px;
+    padding: 8px;
     font-size: 14px;
     text-align: center;
     opacity: 0;
@@ -96,13 +107,12 @@ header {
     font-size: 18px;
     margin-top: 20px;
     color: #ff5757;
-    text-align: center;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
     .grid {
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
     }
 
     .movie img {
@@ -112,10 +122,14 @@ header {
 
 @media (max-width: 480px) {
     .grid {
-        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
     }
 
     .movie img {
         height: 150px;
+    }
+
+    .category-title {
+        font-size: 18px;
     }
 }
