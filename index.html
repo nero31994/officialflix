@@ -7,17 +7,27 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <h1>Movie Site</h1>
-        <input type="text" id="search" placeholder="Search movies..." oninput="debounceSearch()">
-    </header>
+    <h1>Movie Site</h1>
+    <input type="text" id="search" placeholder="Search movies..." oninput="debounceSearch()">
     
     <p id="loading" class="loading">Loading movies...</p>
-    
-    <div id="movies" class="grid"></div>
-    
     <p id="error" class="error"></p>
-    
+
+    <!-- Categories -->
+    <div id="categories">
+        <h2 class="category-title">Popular Movies</h2>
+        <div id="popular" class="grid"></div>
+
+        <h2 class="category-title">Trending Movies</h2>
+        <div id="trending" class="grid"></div>
+
+        <h2 class="category-title">TV Series</h2>
+        <div id="tvseries" class="grid"></div>
+
+        <h2 class="category-title">Anime</h2>
+        <div id="anime" class="grid"></div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
