@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Site</title>
+    <title>NEROFLIX</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -38,7 +38,7 @@
             width: 100%;
             border-radius: 8px;
         }
-        /* Fullscreen video player styling */
+        /* Fullscreen Video Player */
         #videoPlayerContainer {
             position: fixed;
             top: 0;
@@ -75,7 +75,7 @@
     <input type="text" id="search" placeholder="Search movies..." oninput="searchMovies()">
     <div id="movies" class="grid"></div>
 
-    <!-- Fullscreen Video Player Container -->
+    <!-- Fullscreen Video Player -->
     <div id="videoPlayerContainer">
         <button id="closeButton" onclick="closeVideo()">Close</button>
         <iframe id="videoPlayer" allowfullscreen></iframe>
@@ -84,7 +84,7 @@
     <script>
         const API_KEY = '488eb36776275b8ae18600751059fb49'; // Replace with your TMDB API key
         const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-        const PROXY_URL = 'https://officialflix.vercel.app/api/proxy?id='; // Adjusted for Vercel deployment
+        const PROXY_URL = 'https://officialflix.vercel.app/api/proxy?id='; // Your Vercel proxy
 
         async function fetchMovies(url) {
             const res = await fetch(url);
@@ -120,9 +120,9 @@
             try {
                 const res = await fetch(`${PROXY_URL}${movieId}`);
                 const data = await res.json();
-                if (data.videoUrl) {
+                if (data.iframeUrl) {
                     const videoPlayer = document.getElementById('videoPlayer');
-                    videoPlayer.src = data.videoUrl;
+                    videoPlayer.src = data.iframeUrl;
                     document.getElementById('videoPlayerContainer').style.display = 'flex';
                 } else {
                     alert('No video found.');
