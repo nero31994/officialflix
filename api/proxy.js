@@ -11,12 +11,15 @@ export default async function handler(req, res) {
         const response = await fetch(vidSrcUrl);
         let html = await response.text();
 
-        // Remove only ad-related scripts (keeping player scripts intact)
-        html = html.replace(/<script[^>]*ads[^>]*>[\s\S]*?<\/script>/gi, ""); // Remove ad scripts
-        html = html.replace(/<script[^>]*popunder[^>]*>[\s\S]*?<\/script>/gi, ""); // Remove pop-ups
-        html = html.replace(/<a[^>]*href=["'][^"']*google.com[^"']*["'][^>]*>/gi, ""); // Remove Google Play redirects
+        // Remove only ad-related scripts while keeping player scripts
+        html = html.replace(/<script[^>]*(ads|popunder|googletag|analytics|tracking)[^>]*>[\s\S]*?<\/script>/gi, ""); // Block known ad scripts
 
-        // Extract video player iframe
+        // Remove forced redirects
+        html = html.replace(/window\.open/g, "console.log"); // Disable pop-ups
+        html = html.replace(/location\.href/g, "console.log"); // Disable forced redirects
+        html = html.replace(/<a[^>]+target=["']_blank["'][^>]*>/gi, ""); // Remove forced new tabs
+
+        // Extract only the main video player iframe
         const match = html.match(/<iframe[^>]+src="([^"]+)"/);
         if (match && match[1]) {
             const embedUrl = match[1];
@@ -28,35 +31,22 @@ export default async function handler(req, res) {
                     <style>
                         body { margin: 0; background: black; display: flex; justify-content: center; align-items: center; height: 100vh; }
                         iframe { width: 100%; height: 100vh; border: none; }
-                        .blocker {
-                            position: absolute;
-                            width: 100%;
-                            height: 100%;
-                            top: 0;
-                            left: 0;
-                            background: transparent;
-                            z-index: 9999;
-                        }
                     </style>
                 </head>
                 <body>
-                    <div class="blocker" onclick="event.stopPropagation();"></div>
                     <iframe id="vidsrc-frame" src="${embedUrl}" allowfullscreen sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
                     <script>
-                        document.querySelector(".blocker").addEventListener("click", (e) => {
-                            e.stopPropagation();
-                        });
-
-                        // Remove overlay ads dynamically
                         setInterval(() => {
-                            const iframe = document.getElementById("vidsrc-frame");
-                            if (iframe && iframe.contentWindow) {
-                                try {
+                            try {
+                                const iframe = document.getElementById("vidsrc-frame");
+                                if (iframe && iframe.contentWindow) {
                                     const iframeDoc = iframe.contentWindow.document;
-                                    iframeDoc.querySelectorAll("a, .overlay, .ads").forEach(el => el.remove());
-                                } catch (err) {
-                                    console.warn("Unable to modify iframe:", err);
+                                    
+                                    // Remove ad pop-ups dynamically
+                                    iframeDoc.querySelectorAll("a, script[src*='ads'], div[class*='ad'], iframe[src*='ads']").forEach(el => el.remove());
                                 }
+                            } catch (err) {
+                                console.warn("Unable to modify iframe ads:", err);
                             }
                         }, 2000);
                     </script>
