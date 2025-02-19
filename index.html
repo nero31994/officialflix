@@ -5,212 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movie Site</title>
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            background: #141414; 
-            color: white; 
-            margin: 0; 
-            padding: 0;
-        }
-
-        /* Navbar */
-        .navbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px 30px;
-            background: black;
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 100;
-        }
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: red;
-        }
-        #search {
-            padding: 8px;
-            width: 200px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: none;
-        }
-
-        /* Hero Section */
-        .hero {
-            position: relative;
-            height: 450px;
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            align-items: flex-end;
-            padding: 50px;
-        }
-        .hero-content {
-            max-width: 600px;
-        }
-        .hero h1 {
-            font-size: 40px;
-            margin: 0;
-        }
-        .hero p {
-            font-size: 18px;
-            margin: 10px 0;
-        }
-        .hero button {
-            padding: 10px 20px;
-            font-size: 18px;
-            background: red;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-
-        /* Movie Rows */
-        .row {
-            margin: 20px;
-        }
-        .row h2 {
-            margin: 10px 0;
-        }
-        .movie-row {
-            display: flex;
-            overflow-x: auto;
-            gap: 10px;
-            padding-bottom: 10px;
-        }
-        .movie {
-            flex: 0 0 auto;
-            width: 150px;
-            cursor: pointer;
-            transition: transform 0.3s;
-            position: relative;
-        }
-        .movie:hover {
-            transform: scale(1.1);
-        }
-        .movie img {
-            width: 100%;
-            border-radius: 5px;
-        }
-        .movie-info {
-            position: absolute;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            width: 100%;
-            padding: 5px;
-            opacity: 0;
-            transition: 0.3s;
-        }
-        .movie:hover .movie-info {
-            opacity: 1;
-        }
-        .movie-info p {
-            margin: 5px 0;
-            font-size: 14px;
-        }
-        .movie-info button {
-            padding: 5px;
-            background: red;
-            color: white;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-        }
-
-        /* Hide scrollbar */
-        .movie-row::-webkit-scrollbar {
-            display: none;
-        }
+        body { font-family: Arial, sans-serif; background: #121212; color: white; text-align: center; }
+        #search { width: 80%; padding: 10px; margin: 20px 0; font-size: 16px; }
+        .grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+        .movie { width: 150px; cursor: pointer; transition: 0.3s; }
+        .movie:hover { transform: scale(1.05); }
+        .movie img { width: 100%; border-radius: 8px; }
     </style>
 </head>
 <body>
-
-    <!-- Navbar -->
-    <div class="navbar">
-        <div class="logo">MovieFlix</div>
-        <input type="text" id="search" placeholder="Search movies..." oninput="searchMovies()">
-    </div>
-
-    <!-- Hero Section -->
-    <div id="hero" class="hero">
-        <div class="hero-content">
-            <h1 id="hero-title">Featured Movie</h1>
-            <p id="hero-overview">A brief description of the movie...</p>
-            <button onclick="playMovie()">▶ Play</button>
-        </div>
-    </div>
-
-    <!-- Movie Sections -->
-    <div id="popular" class="row">
-        <h2>Popular Movies</h2>
-        <div class="movie-row"></div>
-    </div>
-
-    <div id="trending" class="row">
-        <h2>Trending Now</h2>
-        <div class="movie-row"></div>
-    </div>
+    <h1>Movie Site</h1>
+    <input type="text" id="search" placeholder="Search movies..." oninput="searchMovies()">
+    <div id="movies" class="grid"></div>
 
     <script>
-        const API_KEY = '488eb36776275b8ae18600751059fb49'; 
+        const API_KEY = '488eb36776275b8ae18600751059fb49'; // Replace with your TMDB API key
         const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-        const PROXY_URL = 'https://officialflix.vercel.app/api/proxy?id=';
+        const PROXY_URL = 'https://officialflix.vercel.app/api/proxy?id='; // Replace with your deployed Vercel proxy
 
-        async function fetchMovies(url, rowId) {
+        async function fetchMovies(url) {
             const res = await fetch(url);
             const data = await res.json();
-            displayMovies(data.results, rowId);
+            displayMovies(data.results);
         }
 
-        function displayMovies(movies, rowId) {
-            const row = document.querySelector(`#${rowId} .movie-row`);
-            row.innerHTML = "";
+        function displayMovies(movies) {
+            const moviesDiv = document.getElementById("movies");
+            moviesDiv.innerHTML = "";
             movies.forEach(movie => {
                 const movieEl = document.createElement("div");
                 movieEl.classList.add("movie");
                 movieEl.innerHTML = `
                     <img src="${IMG_URL}${movie.poster_path}" alt="${movie.title}">
-                    <div class="movie-info">
-                        <p>${movie.title}</p>
-                        <p>⭐ ${movie.vote_average.toFixed(1)}</p>
-                        <button onclick="window.open('${PROXY_URL}${movie.id}', '_blank')">▶ Play</button>
-                    </div>
+                    <p>${movie.title}</p>
                 `;
-                row.appendChild(movieEl);
+                movieEl.onclick = () => window.open(`${PROXY_URL}${movie.id}`, "_blank");
+                moviesDiv.appendChild(movieEl);
             });
         }
 
         function searchMovies() {
             const query = document.getElementById("search").value;
             if (query.length > 2) {
-                fetchMovies(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${query}`, "popular");
+                fetchMovies(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${query}`);
             } else {
-                fetchMovies(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`, "popular");
-                fetchMovies(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`, "trending");
+                fetchMovies(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`);
             }
         }
 
-        async function loadHeroMovie() {
-            const res = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`);
-            const data = await res.json();
-            const movie = data.results[0];
-            document.getElementById("hero").style.backgroundImage = `url(${IMG_URL}${movie.backdrop_path})`;
-            document.getElementById("hero-title").innerText = movie.title;
-            document.getElementById("hero-overview").innerText = movie.overview;
-        }
-
-        function playMovie() {
-            alert("Movie is playing...");
-        }
-
-        // Load data on page load
-        loadHeroMovie();
-        fetchMovies(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`, "popular");
-        fetchMovies(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`, "trending");
+        // Load popular movies on page load
+        fetchMovies(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`);
     </script>
-
 </body>
 </html>
