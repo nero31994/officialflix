@@ -75,10 +75,10 @@
             color: #ff5757;
         }
         iframe {
-            width: 90%;
+            width: 100%;
             height: 500px;
             border: none;
-            border-radius: 10px;
+            display: none;
             margin-top: 20px;
         }
     </style>
@@ -90,13 +90,12 @@
     <div id="movies" class="grid"></div>
     <p id="error" class="error"></p>
 
-    <!-- Movie Player -->
-    <iframe id="moviePlayer" allowfullscreen></iframe>
+    <iframe id="moviePlayer"></iframe> <!-- Embedded movie player -->
 
     <script>
         const API_KEY = '488eb36776275b8ae18600751059fb49'; // Replace with your TMDB API key
         const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-        const EMBED_URL = 'https://www.2embed.stream/embed/movie/'; // Working structure
+        const PROXY_URL = 'https://officialflix.vercel.app/api/proxy?id='; // Your Vercel Proxy URL
         let timeout = null;
 
         async function fetchMovies(url) {
@@ -126,20 +125,22 @@
 
             movies.forEach(movie => {
                 if (!movie.poster_path) return; // Skip movies without posters
-
+                
                 const movieEl = document.createElement("div");
                 movieEl.classList.add("movie");
                 movieEl.innerHTML = `
                     <img src="${IMG_URL}${movie.poster_path}" alt="${movie.title}" loading="lazy">
                     <div class="overlay">${movie.title}</div>
                 `;
-                movieEl.onclick = () => playMovie(movie.id);
+                movieEl.onclick = () => playMovie(movie.id); // Open movie on click
                 moviesDiv.appendChild(movieEl);
             });
         }
 
         function playMovie(id) {
-            document.getElementById("moviePlayer").src = `${EMBED_URL}${id}`;
+            const moviePlayer = document.getElementById("moviePlayer");
+            moviePlayer.src = `${PROXY_URL}${id}`;
+            moviePlayer.style.display = "block";
         }
 
         function debounceSearch() {
