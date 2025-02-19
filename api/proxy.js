@@ -11,12 +11,20 @@ export default async function handler(req, res) {
         const response = await fetch(vidSrcUrl);
         let html = await response.text();
 
-        // Extract the main video player iframe only
+        // Remove all JavaScript scripts (ads, trackers, pop-ups)
+        html = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "");
+
+        // Disable onclick pop-ups & unwanted ads
+        html = html.replace(/onclick\s*=\s*["'][^"']*["']/gi, "");
+        html = html.replace(/onmouseover\s*=\s*["'][^"']*["']/gi, "");
+        html = html.replace(/onmousedown\s*=\s*["'][^"']*["']/gi, "");
+        html = html.replace(/target\s*=\s*["_blank"]+/gi, ""); // Prevent forced new tabs
+
+        // Extract only the main video player iframe
         const match = html.match(/<iframe[^>]+src="([^"]+)"/);
         if (match && match[1]) {
             const embedUrl = match[1];
 
-            // Return only the cleaned iframe
             return res.status(200).send(`
                 <html>
                 <head>
@@ -27,7 +35,7 @@ export default async function handler(req, res) {
                     </style>
                 </head>
                 <body>
-                    <iframe src="${embedUrl}" autofullscreen></iframe>
+                    <iframe src="${embedUrl}" allowfullscreen></iframe>
                 </body>
                 </html>
             `);
