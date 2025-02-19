@@ -1,10 +1,12 @@
-const API_KEY = '488eb36776275b8ae18600751059fb49'; // Replace with your TMDB API key
+const API_KEY = '488eb36776275b8ae18600751059fb49';
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-const PROXY_URL = 'https://officialflix.vercel.app/api/proxy?id='; // Proxy route on Vercel
+const PROXY_URL = '/api/proxy?id=';
 let timeout = null;
+let currentPage = 1;
+let currentCategory = 'movie';
 
-// Function to fetch movies from an API URL
-async function fetchMovies(url, containerId) {
+// Fetch Movies
+async function fetchMovies(url, append = false) {
     document.getElementById("loading").style.display = "block";
     try {
         const res = await fetch(url);
@@ -17,21 +19,21 @@ async function fetchMovies(url, containerId) {
         }
 
         document.getElementById("error").innerText = "";
-        displayMovies(data.results, containerId);
+        displayMovies(data.results, append);
     } catch (err) {
         document.getElementById("error").innerText = "Error fetching movies!";
         document.getElementById("loading").style.display = "none";
     }
 }
 
-// Function to display movies in the given container
-function displayMovies(movies, containerId) {
-    const moviesDiv = document.getElementById(containerId);
-    moviesDiv.innerHTML = "";
+// Display Movies
+function displayMovies(movies, append = false) {
+    const moviesDiv = document.getElementById("movies");
+    if (!append) moviesDiv.innerHTML = "";
 
     movies.forEach(movie => {
-        if (!movie.poster_path) return; // Skip movies without posters
-            
+        if (!movie.poster_path) return;
+
         const movieEl = document.createElement("div");
         movieEl.classList.add("movie");
         movieEl.innerHTML = `
@@ -41,28 +43,35 @@ function displayMovies(movies, containerId) {
         movieEl.onclick = () => window.open(`${PROXY_URL}${movie.id}`, "_blank");
         moviesDiv.appendChild(movieEl);
     });
+
+    document.getElementById("loadMore").style.display = "block";
 }
 
-// Search function with debounce
+// Search Function
 function debounceSearch() {
     clearTimeout(timeout);
     timeout = setTimeout(() => {
         const query = document.getElementById("search").value;
         if (query.length > 2) {
-            fetchMovies(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${query}`, "popular");
+            fetchMovies(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${query}`);
         } else {
-            loadCategories();
+            loadCategory(currentCategory);
         }
     }, 300);
 }
 
-// Function to load all categories
-function loadCategories() {
-    fetchMovies(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`, "popular");
-    fetchMovies(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`, "trending");
-    fetchMovies(`https://api.themoviedb.org/3/tv/popular?api_key=${API_KEY}`, "tvseries");
-    fetchMovies(`https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&with_genres=16`, "anime"); // Genre 16 = Anime
+// Load Movies by Category
+function loadCategory(category) {
+    currentCategory = category;
+    currentPage = 1;
+    fetchMovies(`https://api.themoviedb.org/3/${category}/popular?api_key=${API_KEY}`);
 }
 
-// Load all categories on page load
-loadCategories();
+// Load More Function
+document.getElementById("loadMore").addEventListener("click", () => {
+    currentPage++;
+    fetchMovies(`https://api.themoviedb.org/3/${currentCategory}/popular?api_key=${API_KEY}&page=${currentPage}`, true);
+});
+
+// Load Default Movies
+loadCategory('movie');
