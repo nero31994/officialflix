@@ -1,41 +1,39 @@
-import puppeteer from "puppeteer";
-
 export default async function handler(req, res) {
+    const { id } = req.query;
+    if (!id) return res.status(400).json({ error: "Movie ID is required" });
+
+    const vidSrcUrl = `https://vidsrc.me/embed/movie/${id}`;
+
     try {
-        const { id } = req.query;
-        if (!id) {
-            return res.status(400).json({ error: "Movie ID is required" });
-        }
+        const response = await fetch(vidSrcUrl);
+        let html = await response.text();
 
-        const vidSrcUrl = `https://vidsrc.me/embed/movie/${id}`;
+        // Remove pop-ups, redirects, and unwanted scripts
+        html = html
+            .replace(/<script[^>]*>.*?<\/script>/gis, '') // Remove scripts
+            .replace(/window\.open/g, 'console.log') // Disable pop-ups
+            .replace(/location\.href/g, 'console.log'); // Disable forced redirects
 
-        // Launch Puppeteer (headless browser)
-        const browser = await puppeteer.launch({
-            headless: "new", // Ensures headless mode works properly
-            args: ["--no-sandbox", "--disable-setuid-sandbox"], // Required for some server environments
-        });
+        // Inject CSS to prevent overlay click hijacking
+        html = html.replace("</head>", `
+            <style>
+                body { background: #000 !important; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+                iframe { width: 100vw !important; height: 100vh !important; border: none; }
 
-        const page = await browser.newPage();
-        await page.goto(vidSrcUrl, { waitUntil: "networkidle2" });
+                /* Block invisible ad overlays */
+                [onclick], [onmousedown], [onmouseup] {
+                    pointer-events: none !important;
+                }
+            </style>
+            </head>
+        `);
 
-        // Wait for the M3U8 link to appear
-        await page.waitForSelector("video source[src$='.m3u8']", { timeout: 10000 });
+        res.setHeader("Content-Type", "text/html");
+        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins
+        res.setHeader("Access-Control-Allow-Methods", "GET");
 
-        // Extract the M3U8 URL
-        const m3u8Url = await page.evaluate(() => {
-            const videoSource = document.querySelector("video source[src$='.m3u8']");
-            return videoSource ? videoSource.src : null;
-        });
-
-        await browser.close();
-
-        if (!m3u8Url) {
-            return res.status(404).json({ error: "M3U8 source not found" });
-        }
-
-        res.json({ m3u8: m3u8Url });
+        res.status(200).send(html);
     } catch (error) {
-        console.error("Proxy Error:", error.message);
-        res.status(500).json({ error: "Failed to fetch video source" });
+        res.status(500).json({ error: "Failed to fetch video" });
     }
 }
