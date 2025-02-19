@@ -8,23 +8,38 @@ export default async function handler(req, res) {
         const response = await fetch(vidSrcUrl);
         let html = await response.text();
 
-        // Remove pop-ups, redirects, and unwanted scripts
-        html = html
-            .replace(/<script[^>]*>.*?<\/script>/gis, '') // Remove scripts
-            .replace(/window\.open/g, 'console.log') // Disable pop-ups
-            .replace(/location\.href/g, 'console.log'); // Disable forced redirects
+        // Remove all scripts (including dynamically loaded ads)
+        html = html.replace(/<script[^>]*>.*?<\/script>/gis, '');
 
-        // Inject CSS to prevent overlay click hijacking
+        // Block pop-ups and redirects
+        html = html
+            .replace(/window\.open/g, 'console.log')  // Disable pop-ups
+            .replace(/location\.href/g, 'console.log') // Disable forced redirects
+            .replace(/target="_blank"/g, 'target="_self"'); // Prevent new tabs
+
+        // Inject CSS + JavaScript to block overlay hijacking
         html = html.replace("</head>", `
             <style>
                 body { background: #000 !important; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
                 iframe { width: 100vw !important; height: 100vh !important; border: none; }
-
-                /* Block invisible ad overlays */
+                
+                /* Block invisible click hijacking layers */
                 [onclick], [onmousedown], [onmouseup] {
                     pointer-events: none !important;
                 }
+
+                /* Remove hidden iframes (used for ads) */
+                iframe:not([src*="vidsrc"]) { display: none !important; }
             </style>
+            <script>
+                // Block additional pop-ups injected dynamically
+                document.addEventListener('DOMContentLoaded', () => {
+                    setInterval(() => {
+                        const popups = document.querySelectorAll('iframe[src*="ads"], iframe[src*="pop"]');
+                        popups.forEach(el => el.remove()); // Remove ad iframes
+                    }, 500);
+                });
+            </script>
             </head>
         `);
 
