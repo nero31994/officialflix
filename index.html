@@ -74,12 +74,14 @@
             margin-top: 20px;
             color: #ff5757;
         }
+        #playerContainer {
+            display: none;
+            margin-top: 20px;
+        }
         iframe {
             width: 100%;
             height: 500px;
             border: none;
-            display: none;
-            margin-top: 20px;
         }
     </style>
 </head>
@@ -90,12 +92,14 @@
     <div id="movies" class="grid"></div>
     <p id="error" class="error"></p>
 
-    <iframe id="moviePlayer"></iframe> <!-- Embedded movie player -->
+    <div id="playerContainer">
+        <iframe id="moviePlayer" allow="autoplay"></iframe>
+    </div>
 
     <script>
         const API_KEY = '488eb36776275b8ae18600751059fb49'; // Replace with your TMDB API key
         const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-        const PROXY_URL = 'https://officialflix.vercel.app/api/proxy?id='; // Your Vercel Proxy URL
+        const PROXY_URL = '/api/proxy?id='; // Your Vercel Proxy URL
         let timeout = null;
 
         async function fetchMovies(url) {
@@ -139,8 +143,15 @@
 
         function playMovie(id) {
             const moviePlayer = document.getElementById("moviePlayer");
+            const playerContainer = document.getElementById("playerContainer");
+
             moviePlayer.src = `${PROXY_URL}${id}`;
-            moviePlayer.style.display = "block";
+            playerContainer.style.display = "block";
+
+            // Ensure autoplay
+            moviePlayer.onload = () => {
+                moviePlayer.contentWindow.postMessage({ autoplay: true }, "*");
+            };
         }
 
         function debounceSearch() {
