@@ -5,18 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movie Site</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #121212; color: white; text-align: center; }
+        body { font-family: Arial, sans-serif; background: #121212; color: white; text-align: center; margin: 0; padding: 0; }
         #search { width: 80%; padding: 10px; margin: 20px 0; font-size: 16px; }
-        .grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+        .grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; padding-bottom: 20px; }
         .movie { width: 150px; cursor: pointer; transition: 0.3s; }
         .movie:hover { transform: scale(1.05); }
         .movie img { width: 100%; border-radius: 8px; }
+        #player { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.9); justify-content: center; align-items: center; }
+        #player iframe { width: 90%; height: 80%; border: none; border-radius: 10px; }
+        #close { position: absolute; top: 10px; right: 10px; font-size: 24px; cursor: pointer; background: #ff0000; color: white; padding: 5px 10px; border-radius: 5px; }
     </style>
 </head>
 <body>
     <h1>Movie Site</h1>
     <input type="text" id="search" placeholder="Search movies..." oninput="searchMovies()">
     <div id="movies" class="grid"></div>
+
+    <!-- Player Modal -->
+    <div id="player">
+        <span id="close" onclick="closePlayer()">✖</span>
+        <iframe id="iframe" allowfullscreen></iframe>
+    </div>
 
     <script>
         const API_KEY = '488eb36776275b8ae18600751059fb49'; // Replace with your TMDB API key
@@ -39,9 +48,19 @@
                     <img src="${IMG_URL}${movie.poster_path}" alt="${movie.title}">
                     <p>${movie.title}</p>
                 `;
-                movieEl.onclick = () => window.open(`${PROXY_URL}${movie.id}`, "_blank");
+                movieEl.onclick = () => openPlayer(movie.id);
                 moviesDiv.appendChild(movieEl);
             });
+        }
+
+        function openPlayer(movieId) {
+            document.getElementById("iframe").src = `${PROXY_URL}${movieId}`;
+            document.getElementById("player").style.display = "flex";
+        }
+
+        function closePlayer() {
+            document.getElementById("player").style.display = "none";
+            document.getElementById("iframe").src = "";
         }
 
         function searchMovies() {
