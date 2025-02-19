@@ -11,23 +11,23 @@ export default async function handler(req, res) {
         const response = await fetch(embedUrl);
         let html = await response.text();
 
-        // Remove unwanted scripts and prevent popups/redirects
+        // Remove scripts to prevent pop-ups and unwanted redirects
         html = html
-            .replace(/<script[^>]*>.*?<\/script>/gis, '') // Remove all <script> tags
-            .replace(/window\.open/g, 'console.log') // Block pop-ups
-            .replace(/location\.href/g, 'console.log'); // Prevent forced redirects
+            .replace(/<script[^>]*>.*?<\/script>/gis, '') // Remove all scripts
+            .replace(/window\.open/g, 'console.log') // Disable pop-ups
+            .replace(/location\.href/g, 'console.log'); // Disable redirects
 
-        // Inject custom styles to hide unwanted elements
+        // Inject autoplay functionality
         html = html.replace("</head>", `
             <style>
-                body { background: #000 !important; margin: 0; }
-                iframe { width: 100% !important; height: 100vh !important; border: none; }
+                video { autoplay: true !important; }
             </style>
-        </head>`);
+            </head>
+        `);
 
         res.setHeader("Content-Type", "text/html");
-        return res.status(200).send(html);
+        res.send(html);
     } catch (error) {
-        return res.status(500).json({ error: "Failed to fetch movie" });
+        res.status(500).json({ error: "Error fetching movie" });
     }
 }
