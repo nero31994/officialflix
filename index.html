@@ -91,12 +91,12 @@
     <p id="error" class="error"></p>
 
     <!-- Movie Player -->
-    <iframe id="moviePlayer"></iframe>
+    <iframe id="moviePlayer" allowfullscreen></iframe>
 
     <script>
         const API_KEY = '488eb36776275b8ae18600751059fb49'; // Replace with your TMDB API key
         const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-        const PROXY_URL = '/api/proxy?id='; // Your proxy URL
+        const EMBED_URL = 'https://www.2embed.stream/embed/movie/'; // Working structure
         let timeout = null;
 
         async function fetchMovies(url) {
@@ -139,7 +139,7 @@
         }
 
         function playMovie(id) {
-            document.getElementById("moviePlayer").src = `${PROXY_URL}${id}`;
+            document.getElementById("moviePlayer").src = `${EMBED_URL}${id}`;
         }
 
         function debounceSearch() {
