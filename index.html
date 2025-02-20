@@ -3,29 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Site</title>
+    <title>Movie Streaming</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header class="top-menu">
-        <div class="logo-container">
-            <img src="https://i.ibb.co/vxYGP3h8/Photoroom-20240720-094102.png" alt="Logo">
-        </div>
-        <div class="search-container">
-            <input type="text" id="search" placeholder="Search movies or TV..." onkeyup="debounceSearch()">
+
+    <header>
+        <div class="top-bar">
+            <img src="https://i.ibb.co/vxYGP3h8/Photoroom-20240720-094102.png" class="logo">
+            <input type="text" id="search" placeholder="Search movies..." oninput="debounceSearch()">
         </div>
         <nav class="categories">
-            <a href="#" onclick="fetchMovies('movie')">Movies</a>
-            <a href="#" onclick="fetchMovies('tv')">TV Series</a>
-            <a href="#" onclick="fetchMovies('anime')">Anime</a>
+            <a href="#" data-category="movie">Movies</a>
+            <a href="#" data-category="tv">TV Series</a>
+            <a href="#" data-category="anime">Anime</a>
         </nav>
     </header>
 
-    <div class="movie-container">
-        <p id="loading" class="loading">Loading movies...</p>
-        <div id="movies" class="grid"></div>
-        <p id="error" class="error"></p>
-    </div>
+    <main>
+        <div id="error"></div>
+        <div id="movies" class="movies-grid"></div>
+        <div id="loading">Loading...</div>
+    </main>
 
     <script src="script.js"></script>
 </body>
