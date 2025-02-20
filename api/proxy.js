@@ -27,14 +27,14 @@ export default async function handler(req, res) {
             return res.status(200).send(`
                 <html>
                 <head>
-                    <meta name="viewport" content="width=device-width, initial-scale=1">
+                    <meta name="viewport" content="width=device-width, initial-scale=0.9">
                     <style>
                         body { margin: 0; background: black; display: flex; justify-content: center; align-items: center; height: 100vh; }
                         iframe { width: 100%; height: 100vh; border: none; }
                     </style>
                 </head>
                 <body>
-                    <iframe id="vidsrc-frame" src="${embedUrl}" allowfullscreen sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
+                    <iframe id="vidsrc-frame" src="${embedUrl}" autofullscreen sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
                     <script>
                         setInterval(() => {
                             try {
