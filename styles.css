@@ -1,4 +1,4 @@
-/* Global Styles */
+/* General Styles */
 body {
     font-family: Arial, sans-serif;
     background: #121212;
@@ -6,40 +6,33 @@ body {
     text-align: center;
     margin: 0;
     padding: 0;
-    position: relative;
     overflow-x: hidden;
 }
 
-/* Background GIF */
+/* Background Overlay */
 .background-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: url('https://i.ibb.co/4ZyGc32/water-4-1.gif') no-repeat center center/cover;
-    opacity: 0.4;
+    background: url("https://i.ibb.co/X3Qv7dn/giphy.gif") center/cover no-repeat;
+    filter: blur(8px);
     z-index: -1;
 }
 
 /* Sticky Header */
 .top-menu {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.2);
-    padding: 10px 20px;
-    border-radius: 12px;
-    backdrop-filter: blur(10px);
     position: fixed;
     top: 0;
     width: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
     z-index: 1000;
-}
-
-/* Space for fixed header */
-body {
-    padding-top: 70px;
 }
 
 /* Logo */
@@ -50,20 +43,18 @@ body {
 /* Search Bar */
 .search-container {
     flex-grow: 1;
-    display: flex;
-    justify-content: center;
+    text-align: center;
 }
 
-.search-container input {
-    width: 100%;
-    max-width: 300px;
+#search {
+    width: 90%;
+    max-width: 400px;
     padding: 10px;
-    border: none;
-    border-radius: 8px;
     font-size: 16px;
-    background: rgba(255, 255, 255, 0.3);
-    color: white;
+    border-radius: 20px;
+    border: none;
     outline: none;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
 }
 
 /* Movie Grid */
@@ -71,12 +62,12 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 15px;
-    padding: 20px;
-    max-width: 1000px;
+    padding: 80px 20px 20px;
+    max-width: 1200px;
     margin: auto;
 }
 
-/* Movie Cards */
+/* Movie Item */
 .movie {
     position: relative;
     cursor: pointer;
@@ -93,6 +84,7 @@ body {
     object-fit: cover;
 }
 
+/* Movie Overlay */
 .movie .overlay {
     position: absolute;
     bottom: 0;
@@ -110,23 +102,76 @@ body {
     opacity: 1;
 }
 
-/* Loading Animation */
-.loading {
-    display: none;
-    text-align: center;
+/* Loading & Error */
+.loading, .error {
     font-size: 18px;
-    margin: 20px 0;
+    margin-top: 20px;
+    color: #ff5757;
 }
 
-/* Responsive Fixes */
-@media (max-width: 768px) {
+/* Movie Info Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 500px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    padding: 20px;
+    border-radius: 10px;
+    color: white;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.modal-content {
+    text-align: center;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+#watchNow {
+    background: #ff5757;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-top: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#watchNow:hover {
+    background: #ff0000;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
     .top-menu {
         flex-direction: column;
-        text-align: center;
+        padding: 10px;
     }
 
     .search-container {
         width: 100%;
-        margin-top: 5px;
+        margin-top: 10px;
+    }
+
+    #search {
+        width: 100%;
+    }
+
+    .grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        padding-top: 100px;
     }
 }
