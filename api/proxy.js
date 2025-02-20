@@ -27,10 +27,10 @@ export default async function handler(req, res) {
             return res.status(200).send(`
                 <html>
                 <head>
-                    <meta name="viewport" content="width=device-width, initial-scale=0.9">
+                    <meta name="viewport" content="width=device-width, initial-scale=1">
                     <style>
                         body { margin: 0; background: black; display: flex; justify-content: center; align-items: center; height: 100vh; }
-                        iframe { width: 100%; height: 90vh; border: none; }
+                        iframe { width: 100%; height: 80vh; border: none; }
                     </style>
                 </head>
                 <body>
