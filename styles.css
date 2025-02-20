@@ -1,3 +1,4 @@
+/* General Styles */
 body {
     font-family: Arial, sans-serif;
     background: url('https://i.ibb.co/X3Qv7dn/giphy.gif') no-repeat center center fixed;
@@ -7,90 +8,108 @@ body {
     padding: 0;
 }
 
+/* Header / Top Menu */
 header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 15px;
-    background: rgba(0, 0, 0, 0.8);
-    position: fixed;
-    width: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 10px 20px;
+    position: sticky;
     top: 0;
+    width: 100%;
     z-index: 1000;
 }
 
-.logo-container img {
-    width: 50px;
-    height: auto;
+.logo img {
+    height: 40px;
 }
 
 #search {
-    flex: 1;
-    margin: 0 15px;
+    width: 60%;
     padding: 10px;
-    font-size: 16px;
     border-radius: 5px;
     border: none;
 }
 
-nav ul {
-    list-style: none;
-    display: flex;
-    padding: 0;
-    margin: 0;
-}
-
-nav ul li {
-    margin: 0 10px;
-}
-
-nav ul li a {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-.container {
-    padding-top: 80px;
-}
-
-.grid {
+/* Movie Grid */
+.movie-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 15px;
     padding: 20px;
 }
 
-.movie img {
-    width: 100%;
-    border-radius: 8px;
-    object-fit: cover;
-    transition: transform 0.3s ease-in-out;
-}
-
-.movie:hover {
-    transform: scale(1.05);
-}
-
-.episode-list {
-    margin-top: 20px;
-    padding: 15px;
-}
-
-.episode {
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.1);
-    margin: 5px 0;
+.movie {
+    position: relative;
     cursor: pointer;
 }
 
-@media (max-width: 600px) {
-    nav ul {
-        flex-direction: column;
-        align-items: center;
-    }
+.movie img {
+    width: 100%;
+    border-radius: 10px;
+    transition: transform 0.3s;
+}
 
-    .grid {
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    }
+.movie:hover img {
+    transform: scale(1.05);
+}
+
+.overlay {
+    position: absolute;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    width: 100%;
+    padding: 5px;
+    text-align: center;
+}
+
+/* Episode Popup */
+.popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 500px;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.popup-content {
+    text-align: center;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.episode {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.episode:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* Loading Indicator */
+#loading {
+    text-align: center;
+    padding: 20px;
+    font-size: 18px;
+    display: none;
 }
