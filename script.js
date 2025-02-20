@@ -1,6 +1,8 @@
 const API_KEY = '488eb36776275b8ae18600751059fb49';
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
+let page = 1;
 
+// Fetch Movies
 async function fetchMovies(url) {
     document.getElementById("loading").style.display = "block";
     try {
@@ -9,7 +11,6 @@ async function fetchMovies(url) {
         document.getElementById("loading").style.display = "none";
 
         if (!data.results || data.results.length === 0) {
-            document.getElementById("movies").innerHTML = "<p>No movies found!</p>";
             return;
         }
 
@@ -20,13 +21,12 @@ async function fetchMovies(url) {
     }
 }
 
-// Display Movies Only
+// Display Movies
 function displayMovies(movies) {
     const moviesDiv = document.getElementById("movies");
-    moviesDiv.innerHTML = "";
 
     movies.forEach(movie => {
-        if (!movie.poster_path || movie.media_type === "tv") return; // Ignore TV shows
+        if (!movie.poster_path) return;
 
         const movieEl = document.createElement("div");
         movieEl.classList.add("movie");
@@ -39,9 +39,18 @@ function displayMovies(movies) {
     });
 }
 
+// Infinite Scroll
+window.addEventListener("scroll", () => {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+        page++;
+        fetchMovies(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&page=${page}`);
+    }
+});
+
 // Search Movies
 document.getElementById("search-btn").addEventListener("click", () => {
     const query = document.getElementById("search").value;
+    document.getElementById("movies").innerHTML = "";
     fetchMovies(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${query}`);
 });
 
