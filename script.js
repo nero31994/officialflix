@@ -1,6 +1,6 @@
 const API_KEY = '488eb36776275b8ae18600751059fb49';
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-const PROXY_URL = '/api/proxy?id=';
+const PROXY_URL = 'https://officialflix.vercel.app/api/proxy?id=';
 
 let currentPage = 1;
 let currentQuery = '';
@@ -37,7 +37,7 @@ async function fetchMovies(query = '', page = 1) {
     }
 }
 
-// Display movies or TV shows
+// Display movies
 function displayMovies(movies, clear = false) {
     const moviesDiv = document.getElementById("movies");
 
@@ -52,24 +52,41 @@ function displayMovies(movies, clear = false) {
             <img src="${IMG_URL}${movie.poster_path}" alt="${movie.title || movie.name}" loading="lazy">
             <div class="overlay">${movie.title || movie.name}</div>
         `;
-        movieEl.onclick = () => window.open(`${PROXY_URL}${movie.id}`, "_blank");
+        movieEl.onclick = () => showMovieInfo(movie);
         moviesDiv.appendChild(movieEl);
     });
 }
 
-// Debounce search input
+// Show movie info popup
+function showMovieInfo(movie) {
+    const modal = document.getElementById("movieModal");
+    document.getElementById("modalTitle").innerText = movie.title || movie.name;
+    document.getElementById("modalOverview").innerText = movie.overview || "No description available.";
+    document.getElementById("modalRelease").innerText = `Release Date: ${movie.release_date || "N/A"}`;
+    document.getElementById("modalRating").innerText = `Rating: ${movie.vote_average}/10`;
+
+    document.getElementById("watchNow").onclick = () => {
+        window.open(`${PROXY_URL}${movie.id}`, "_blank");
+        modal.style.display = "none";
+    };
+
+    modal.style.display = "block";
+}
+
+// Close movie info popup
+function closeModal() {
+    document.getElementById("movieModal").style.display = "none";
+}
+
+// Search function with debounce
 function debounceSearch() {
     clearTimeout(timeout);
     timeout = setTimeout(() => {
         const query = document.getElementById("search").value.trim();
         if (query.length > 2) {
-            currentQuery = query;
-            currentPage = 1;
-            fetchMovies(query, currentPage);
-        } else {
-            currentQuery = '';
-            currentPage = 1;
-            fetchMovies();
+            currentQuery = query;  // Update global query
+            currentPage = 1;  // Reset pagination
+            fetchMovies(currentQuery, currentPage);
         }
     }, 300);
 }
@@ -82,5 +99,5 @@ window.addEventListener('scroll', () => {
     }
 });
 
-// Load initial movies on page load
+// Load initial movies
 fetchMovies();
