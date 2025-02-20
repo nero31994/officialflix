@@ -7,23 +7,22 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <h1>Movie Site</h1>
-        <button id="darkModeToggle">🌙</button>
+
+    <!-- Top Navigation -->
+    <header class="top-nav">
+        <input type="text" id="search" placeholder="Search movies..." oninput="debounceSearch()">
+        <nav class="categories">
+            <button onclick="fetchMoviesByCategory('movie/popular')">Popular</button>
+            <button onclick="fetchMoviesByCategory('movie/top_rated')">Top Rated</button>
+            <button onclick="fetchMoviesByCategory('movie/now_playing')">Now Playing</button>
+            <button onclick="fetchMoviesByCategory('tv/popular')">TV Series</button>
+            <button onclick="fetchMoviesByCategory('tv/top_rated')">Top TV Shows</button>
+            <button onclick="fetchMoviesByCategory('discover/anime')">Anime</button>
+        </nav>
     </header>
 
-    <input type="text" id="search" placeholder="Search movies..." oninput="debounceSearch()">
-    
-    <nav>
-        <button class="tab" onclick="loadCategory('movie')">Movies</button>
-        <button class="tab" onclick="loadCategory('tv')">TV Series</button>
-        <button class="tab" onclick="loadCategory('anime')">Anime</button>
-    </nav>
-
-    <div id="movies" class="grid"></div>
-    <button id="loadMore">Load More</button>
-    
     <p id="loading" class="loading">Loading movies...</p>
+    <div id="movies" class="grid"></div>
     <p id="error" class="error"></p>
 
     <script src="script.js"></script>
