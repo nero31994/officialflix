@@ -1,15 +1,8 @@
 const API_KEY = '488eb36776275b8ae18600751059fb49';
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-const PROXY_URL = 'https://officialflix.vercel.app/api/proxy?id='; // Proxy route on Vercel
+const PROXY_URL = '/api/proxy?id='; 
 let page = 1;
 let query = "";
-
-// Load movies on scroll
-window.addEventListener('scroll', () => {
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
-        loadMovies();
-    }
-});
 
 // Fetch movies
 async function loadMovies() {
@@ -53,7 +46,36 @@ function displayMovies(movies) {
     });
 }
 
-// Search Functionality
+// Load episodes for TV shows
+async function showEpisodePopup(tvId, seriesTitle) {
+    try {
+        const res = await fetch(`https://api.themoviedb.org/3/tv/${tvId}/season/1?api_key=${API_KEY}`);
+        const data = await res.json();
+        
+        const episodesDiv = document.getElementById("episodes");
+        episodesDiv.innerHTML = "";
+        document.getElementById("series-title").innerText = seriesTitle;
+
+        data.episodes.forEach(episode => {
+            const epEl = document.createElement("div");
+            epEl.classList.add("episode");
+            epEl.innerHTML = `<p>${episode.episode_number}: ${episode.name}</p>`;
+            epEl.onclick = () => window.open(`${PROXY_URL}${tvId}-s01e${episode.episode_number}`, "_blank");
+            episodesDiv.appendChild(epEl);
+        });
+
+        document.getElementById("episode-popup").style.display = "block";
+    } catch (error) {
+        console.error("Error loading episodes:", error);
+    }
+}
+
+// Close Popup
+document.getElementById("close-popup").addEventListener("click", () => {
+    document.getElementById("episode-popup").style.display = "none";
+});
+
+// Search
 document.getElementById("search-btn").addEventListener("click", () => {
     query = document.getElementById("search").value.trim();
     if (query.length > 2) {
@@ -65,3 +87,10 @@ document.getElementById("search-btn").addEventListener("click", () => {
 
 // Load movies on page load
 loadMovies();
+
+// Infinite Scroll
+window.addEventListener('scroll', () => {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+        loadMovies();
+    }
+});
