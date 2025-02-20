@@ -1,38 +1,44 @@
-const API_KEY = '488eb36776275b8ae18600751059fb49'; // Replace with your TMDB API key
+const API_KEY = '488eb36776275b8ae18600751059fb49'; // TMDB API Key
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-const PROXY_URL = 'https://officialflix.vercel.app/api/proxy?id='; // Proxy route on Vercel
+const PROXY_URL = '/api/proxy?id='; // Proxy route on Vercel
 
 let timeout = null;
-let selectedCategory = 'movie'; // Default category
+let selectedCategory = 'movie';
+let page = 1;
+let isFetching = false;
 
-async function fetchMovies(url) {
+async function fetchMovies(url, append = false) {
+    if (isFetching) return;
+    isFetching = true;
     document.getElementById("loading").style.display = "block";
+
     try {
         const res = await fetch(url);
         const data = await res.json();
         document.getElementById("loading").style.display = "none";
+        isFetching = false;
 
         if (!data.results || data.results.length === 0) {
             document.getElementById("error").innerText = "No movies found!";
-            document.getElementById("movies").innerHTML = "";
             return;
         }
 
         document.getElementById("error").innerText = "";
-        displayMovies(data.results);
+        displayMovies(data.results, append);
     } catch (err) {
         document.getElementById("error").innerText = "Error fetching movies!";
         document.getElementById("loading").style.display = "none";
+        isFetching = false;
     }
 }
 
-function displayMovies(movies) {
+function displayMovies(movies, append = false) {
     const moviesDiv = document.getElementById("movies");
-    moviesDiv.innerHTML = "";
+    if (!append) moviesDiv.innerHTML = ""; // Clear if new category selected
 
     movies.forEach(movie => {
-        if (!movie.poster_path) return; // Skip if no poster
-        
+        if (!movie.poster_path) return;
+
         const movieEl = document.createElement("div");
         movieEl.classList.add("movie");
         movieEl.innerHTML = `
@@ -50,7 +56,7 @@ function displayMovies(movies) {
     });
 }
 
-// Fetch Episodes for a TV Series
+// Fetch Episodes for TV Series
 async function fetchEpisodes(tvId) {
     const url = `https://api.themoviedb.org/3/tv/${tvId}/season/1?api_key=${API_KEY}`;
     
@@ -60,7 +66,7 @@ async function fetchEpisodes(tvId) {
         const episodes = data.episodes || [];
 
         const moviesDiv = document.getElementById("movies");
-        moviesDiv.innerHTML = ""; // Clear previous movies
+        moviesDiv.innerHTML = "";
 
         episodes.forEach(ep => {
             const epEl = document.createElement("div");
@@ -78,26 +84,23 @@ async function fetchEpisodes(tvId) {
     }
 }
 
-function debounceSearch() {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => {
-        const query = document.getElementById("search").value;
-        if (query.length > 2) {
-            fetchMovies(`https://api.themoviedb.org/3/search/${selectedCategory}?api_key=${API_KEY}&query=${query}`);
-        } else {
-            fetchMovies(`https://api.themoviedb.org/3/${selectedCategory}/popular?api_key=${API_KEY}`);
-        }
-    }, 300);
-}
+// Infinite Scroll
+window.addEventListener('scroll', () => {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
+        page++;
+        fetchMovies(`https://api.themoviedb.org/3/${selectedCategory}/popular?api_key=${API_KEY}&page=${page}`, true);
+    }
+});
 
-// Category Click Event
+// Category Click
 document.querySelectorAll(".categories a").forEach(link => {
     link.addEventListener("click", (e) => {
         e.preventDefault();
         selectedCategory = e.target.dataset.category;
+        page = 1;
         fetchMovies(`https://api.themoviedb.org/3/${selectedCategory}/popular?api_key=${API_KEY}`);
     });
 });
 
-// Load popular movies on page load
+// Load Default
 fetchMovies(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`);
