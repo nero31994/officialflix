@@ -1,16 +1,21 @@
 const API_KEY = '488eb36776275b8ae18600751059fb49';
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 const PROXY_URL = '/api/proxy?id=';
-let currentCategory = 'movie';
+
 let currentPage = 1;
+let currentQuery = '';
 let isFetching = false;
 let timeout = null;
 
-async function fetchMovies(category, page = 1) {
+// Fetch movies or TV shows
+async function fetchMovies(query = '', page = 1) {
     if (isFetching) return;
     isFetching = true;
     document.getElementById("loading").style.display = "block";
-    let url = `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&page=${page}`;
+
+    let url = query
+        ? `https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${query}&page=${page}`
+        : `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&page=${page}`;
 
     try {
         const res = await fetch(url);
@@ -18,22 +23,25 @@ async function fetchMovies(category, page = 1) {
         document.getElementById("loading").style.display = "none";
 
         if (!data.results || data.results.length === 0) {
-            document.getElementById("error").innerText = "No movies found!";
+            document.getElementById("error").innerText = "No results found!";
             return;
         }
 
         document.getElementById("error").innerText = "";
-        displayMovies(data.results);
+        displayMovies(data.results, page === 1);
     } catch (err) {
-        document.getElementById("error").innerText = "Error fetching movies!";
+        document.getElementById("error").innerText = "Error fetching data!";
         document.getElementById("loading").style.display = "none";
     } finally {
         isFetching = false;
     }
 }
 
-function displayMovies(movies) {
+// Display movies or TV shows
+function displayMovies(movies, clear = false) {
     const moviesDiv = document.getElementById("movies");
+
+    if (clear) moviesDiv.innerHTML = ""; // Clear previous results when searching
 
     movies.forEach(movie => {
         if (!movie.poster_path) return;
@@ -41,19 +49,28 @@ function displayMovies(movies) {
         const movieEl = document.createElement("div");
         movieEl.classList.add("movie");
         movieEl.innerHTML = `
-            <img src="${IMG_URL}${movie.poster_path}" alt="${movie.title}" loading="lazy">
-            <div class="overlay">${movie.title}</div>
+            <img src="${IMG_URL}${movie.poster_path}" alt="${movie.title || movie.name}" loading="lazy">
+            <div class="overlay">${movie.title || movie.name}</div>
         `;
         movieEl.onclick = () => window.open(`${PROXY_URL}${movie.id}`, "_blank");
         moviesDiv.appendChild(movieEl);
     });
 }
 
+// Debounce search input
 function debounceSearch() {
     clearTimeout(timeout);
     timeout = setTimeout(() => {
-        const query = document.getElementById("search").value;
-        fetchMovies(query ? `search/${query}` : currentCategory);
+        const query = document.getElementById("search").value.trim();
+        if (query.length > 2) {
+            currentQuery = query;
+            currentPage = 1;
+            fetchMovies(query, currentPage);
+        } else {
+            currentQuery = '';
+            currentPage = 1;
+            fetchMovies();
+        }
     }, 300);
 }
 
@@ -61,9 +78,9 @@ function debounceSearch() {
 window.addEventListener('scroll', () => {
     if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
         currentPage++;
-        fetchMovies(currentCategory, currentPage);
+        fetchMovies(currentQuery, currentPage);
     }
 });
 
-// Load initial movies
-fetchMovies(currentCategory);
+// Load initial movies on page load
+fetchMovies();
