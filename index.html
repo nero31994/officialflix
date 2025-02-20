@@ -3,30 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Site</title>
+    <title>Movie Streaming</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
+    <!-- Top Menu -->
     <header>
-        <div class="logo-container">
+        <div class="logo">
             <img src="https://i.ibb.co/vxYGP3h8/Photoroom-20240720-094102.png" alt="Logo">
         </div>
-        <input type="text" id="search" placeholder="Search movies...">
-        <nav>
-            <ul>
-                <li><a href="#" onclick="fetchCategory('popular')">Popular</a></li>
-                <li><a href="#" onclick="fetchCategory('movie')">Movies</a></li>
-                <li><a href="#" onclick="fetchCategory('tv')">TV Series</a></li>
-                <li><a href="#" onclick="fetchCategory('anime')">Anime</a></li>
-            </ul>
-        </nav>
+        <input type="text" id="search" placeholder="Search movies..." onkeyup="debounceSearch()">
     </header>
 
-    <div class="container">
-        <p id="loading" class="loading">Loading movies...</p>
-        <div id="movies" class="grid"></div>
-        <div id="episodes" class="episode-list"></div>
-        <p id="error" class="error"></p>
+    <!-- Movie Grid -->
+    <div id="movies" class="movie-grid"></div>
+    
+    <!-- Loading Indicator -->
+    <div id="loading">Loading...</div>
+
+    <!-- Episode Popup -->
+    <div id="episodePopup" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup()">&times;</span>
+            <h2 id="popupTitle">Episodes</h2>
+            <div id="episodeList"></div>
+        </div>
     </div>
 
     <script src="script.js"></script>
