@@ -6,7 +6,7 @@ body {
     background-size: cover;
 }
 
-/* Top Menu Bar */
+/* Top Menu */
 #top-menu {
     display: flex;
     align-items: center;
@@ -20,8 +20,12 @@ body {
 }
 
 /* Logo */
+.logo-container {
+    display: flex;
+    align-items: center;
+}
 #logo {
-    height: 40px;
+    height: 35px;
     width: auto;
     margin-right: 15px;
 }
@@ -52,10 +56,6 @@ body {
     margin-left: 5px;
 }
 
-#search-btn:hover {
-    background: #e63600;
-}
-
 /* Movie Grid */
 #movies {
     display: grid;
@@ -64,13 +64,30 @@ body {
     padding: 80px 20px 20px;
 }
 
+/* Episode Popup */
+#episode-popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 600px;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.hidden { display: none; }
+
 /* Adjustments for Smaller Screens */
 @media (max-width: 600px) {
     #top-menu {
         flex-direction: column;
         padding: 10px;
     }
-
     #search-container {
         width: 100%;
         margin-top: 5px;
