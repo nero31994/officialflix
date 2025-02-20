@@ -34,6 +34,7 @@ function displayMovies(movies) {
             <div class="overlay">${movie.title}</div>
         `;
 
+        // Ensuring movies are clickable
         movieEl.onclick = () => {
             if (movie.media_type === "tv") {
                 showEpisodePopup(movie.id, movie.name || movie.title);
