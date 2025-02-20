@@ -1,77 +1,72 @@
-const API_KEY = '488eb36776275b8ae18600751059fb49'; // Replace with your TMDB API key
+const API_KEY = '488eb36776275b8ae18600751059fb49';
+const BASE_URL = 'https://api.themoviedb.org/3';
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-const PROXY_URL = '/api/proxy?id='; // Proxy route on Vercel
+const PROXY_URL = 'https://officialflix.vercel.app/api/proxy?id=';
+
 let currentCategory = 'movie';
 let currentPage = 1;
-let currentProvider = null;
-let timeout = null;
 
-async function fetchMovies(category = 'movie', page = 1, searchQuery = "", providerID = null) {
-    document.getElementById("loading").style.display = "block";
-    currentCategory = category;
-    currentPage = page;
-    currentProvider = providerID;
+const loadingEl = document.getElementById("loading");
+const errorEl = document.getElementById("error");
+const moviesDiv = document.getElementById("movies");
+const loadMoreBtn = document.getElementById("load-more");
 
-    let url = '';
+// Fetch movies based on category & page
+async function fetchMovies(category = 'movie', page = 1) {
+    loadingEl.style.display = "block";
 
-    if (searchQuery) {
-        url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${searchQuery}&page=${page}`;
-    } else {
-        url = `https://api.themoviedb.org/3/discover/${category}?api_key=${API_KEY}&page=${page}`;
-        if (category === 'anime') {
-            url += `&with_genres=16`; // Anime genre filtering
-        }
-    }
+    const categoryURLs = {
+        movie: `${BASE_URL}/movie/popular?api_key=${API_KEY}&page=${page}`,
+        tv: `${BASE_URL}/tv/popular?api_key=${API_KEY}&page=${page}`,
+        anime: `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_genres=16&page=${page}`
+    };
 
-    if (providerID) {
-        url += `&with_watch_providers=${providerID}&watch_region=US`; // Apply streaming provider filter
-    }
+    const url = categoryURLs[category] || categoryURLs['movie'];
 
     try {
         const res = await fetch(url);
+        if (!res.ok) throw new Error("Failed to fetch movies");
+        
         const data = await res.json();
-        document.getElementById("loading").style.display = "none";
+        loadingEl.style.display = "none";
 
-        if (!data.results || data.results.length === 0) {
-            document.getElementById("error").innerText = "No movies found!";
+        if (!data?.results?.length) {
+            errorEl.innerText = "No movies found!";
             return;
         }
 
-        document.getElementById("error").innerText = "";
+        errorEl.innerText = "";
         displayMovies(data.results, page === 1);
     } catch (err) {
-        document.getElementById("error").innerText = "Error fetching movies!";
-        document.getElementById("loading").style.display = "none";
+        console.error(err);
+        errorEl.innerText = "Error fetching movies!";
+        loadingEl.style.display = "none";
     }
 }
 
-function displayMovies(movies, reset = false) {
-    const moviesDiv = document.getElementById("movies");
-    if (reset) moviesDiv.innerHTML = "";
+// Render movies
+function displayMovies(movies, clear = false) {
+    if (clear) moviesDiv.innerHTML = "";
 
-    movies.forEach(movie => {
-        if (!movie.poster_path) return;
+    movies.forEach(({ id, poster_path, title }) => {
+        if (!poster_path) return;
+
         const movieEl = document.createElement("div");
         movieEl.classList.add("movie");
         movieEl.innerHTML = `
-            <img src="${IMG_URL}${movie.poster_path}" alt="${movie.title}" loading="lazy">
-            <div class="overlay">${movie.title}</div>
+            <img src="${IMG_URL}${poster_path}" alt="${title}" loading="lazy">
+            <div class="overlay">${title}</div>
         `;
-        movieEl.onclick = () => window.open(`${PROXY_URL}${movie.id}`, "_blank");
+        movieEl.onclick = () => window.open(`${PROXY_URL}${id}`, "_blank");
         moviesDiv.appendChild(movieEl);
     });
 }
 
-function loadMoreMovies() {
-    fetchMovies(currentCategory, ++currentPage, "", currentProvider);
-}
+// Load more movies
+loadMoreBtn.addEventListener("click", () => {
+    currentPage++;
+    fetchMovies(currentCategory, currentPage);
+});
 
-function debounceSearch() {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => {
-        fetchMovies('movie', 1, document.getElementById("search").value);
-    }, 300);
-}
-
-// Load default movies on page load
-fetchMovies();
+// Initial Load
+fetchMovies(currentCategory);
