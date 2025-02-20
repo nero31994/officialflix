@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NERO FLIX</title>
+    <title>Movie Site</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="background-overlay"></div>
-
     <header class="top-menu">
+        <div class="logo-container">
+            <img src="https://i.ibb.co/vxYGP3h8/Photoroom-20240720-094102.png" alt="Logo">
+        </div>
         <div class="search-container">
-            <input type="text" id="search" placeholder="Search movies..." onkeyup="debounceSearch()">
+            <input type="text" id="search" placeholder="Search movies or TV..." onkeyup="debounceSearch()">
         </div>
         <nav class="categories">
             <a href="#" onclick="fetchMovies('movie')">Movies</a>
@@ -20,11 +21,11 @@
         </nav>
     </header>
 
-    <p id="loading" class="loading">Loading movies...</p>
-    <div id="movies" class="grid"></div>
-    <p id="error" class="error"></p>
-
-    <button id="load-more" class="load-more-btn">Load More</button>
+    <div class="movie-container">
+        <p id="loading" class="loading">Loading movies...</p>
+        <div id="movies" class="grid"></div>
+        <p id="error" class="error"></p>
+    </div>
 
     <script src="script.js"></script>
 </body>
