@@ -1,11 +1,16 @@
 /* General Styles */
-body {
-    font-family: Arial, sans-serif;
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
     background: url('https://i.ibb.co/X3Qv7dn/giphy.gif') no-repeat center center fixed;
     background-size: cover;
     color: white;
+    overflow-x: hidden;
 }
 
 /* Top Menu */
@@ -19,6 +24,7 @@ body {
     background: rgba(0, 0, 0, 0.7);
     padding: 10px 20px;
     z-index: 1000;
+    height: 60px;
 }
 
 /* Logo */
@@ -38,6 +44,7 @@ body {
     align-items: center;
     flex-grow: 1;
     max-width: 500px;
+    position: relative;
 }
 
 #search {
@@ -45,6 +52,7 @@ body {
     padding: 8px;
     border: none;
     border-radius: 5px 0 0 5px;
+    font-size: 16px;
 }
 
 #search-btn {
@@ -59,7 +67,7 @@ body {
 /* Movie Grid */
 .movie-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 15px;
     padding: 80px 20px 20px;
 }
@@ -69,7 +77,7 @@ body {
     position: relative;
     overflow: hidden;
     border-radius: 15px;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease-in-out;
     backdrop-filter: blur(10px);
 }
 
@@ -101,26 +109,26 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 80%;
-    max-height: 80%;
-    background: rgba(0, 0, 0, 0.8);
+    width: 90%;
+    max-width: 600px;
+    background: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(15px);
     padding: 20px;
     border-radius: 10px;
     overflow-y: auto;
+    max-height: 80vh;
     z-index: 2000;
 }
 
 /* Responsive */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     .top-menu {
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
+        flex-direction: column;
+        height: auto;
+        padding: 10px;
     }
 
     .logo-container {
-        width: 100%;
         justify-content: center;
         margin-bottom: 10px;
     }
@@ -131,6 +139,21 @@ body {
     }
 
     .movie-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    .movie-grid {
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+
+    .top-menu {
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    .logo {
+        height: 30px;
     }
 }
