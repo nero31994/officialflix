@@ -1,10 +1,6 @@
 const API_KEY = '488eb36776275b8ae18600751059fb49';
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-const PROXY_URL = '/api/proxy?id=';
 
-let timeout = null;
-
-// Fetch Movies
 async function fetchMovies(url) {
     document.getElementById("loading").style.display = "block";
     try {
@@ -24,14 +20,14 @@ async function fetchMovies(url) {
     }
 }
 
-// Display Movies
+// Display Movies Only
 function displayMovies(movies) {
     const moviesDiv = document.getElementById("movies");
     moviesDiv.innerHTML = "";
 
     movies.forEach(movie => {
-        if (!movie.poster_path) return;
-        
+        if (!movie.poster_path || movie.media_type === "tv") return; // Ignore TV shows
+
         const movieEl = document.createElement("div");
         movieEl.classList.add("movie");
         movieEl.innerHTML = `
@@ -39,33 +35,11 @@ function displayMovies(movies) {
             <div class="overlay">${movie.title}</div>
         `;
 
-        // Click Event for Episodes
-        movieEl.onclick = () => fetchEpisodes(movie.id, movie.title);
         moviesDiv.appendChild(movieEl);
     });
 }
 
-// Fetch Episodes (TV Series)
-async function fetchEpisodes(tvId, title) {
-    try {
-        const res = await fetch(`https://api.themoviedb.org/3/tv/${tvId}/season/1?api_key=${API_KEY}`);
-        const data = await res.json();
-
-        if (!data.episodes || data.episodes.length === 0) {
-            alert("No episodes available.");
-            return;
-        }
-
-        const episodeList = data.episodes.map(ep => `<p>Episode ${ep.episode_number}: ${ep.name}</p>`).join("");
-        document.getElementById("series-title").innerText = title;
-        document.getElementById("episodes-list").innerHTML = episodeList;
-        document.getElementById("episodes-popup").style.display = "block";
-    } catch (err) {
-        console.error("Error fetching episodes:", err);
-    }
-}
-
-// Search Functionality
+// Search Movies
 document.getElementById("search-btn").addEventListener("click", () => {
     const query = document.getElementById("search").value;
     fetchMovies(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${query}`);
