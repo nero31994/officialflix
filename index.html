@@ -3,27 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Site</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Movie Streaming</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Top Menu -->
-    <div id="top-menu">
+    <!-- Top Menu (Fixed) -->
+    <header class="top-menu">
         <div class="logo-container">
-            <img id="logo" src="https://i.ibb.co/vxYGP3h8/Photoroom-20240720-094102.png" alt="Logo">
+            <img src="https://i.ibb.co/vxYGP3h8/Photoroom-20240720-094102.png" alt="Logo" class="logo">
         </div>
-        <div id="search-container">
-            <input type="text" id="search" placeholder="Search...">
+        <div class="search-container">
+            <input type="text" id="search" placeholder="Search movies...">
             <button id="search-btn">🔍</button>
         </div>
-    </div>
+    </header>
 
-    <!-- Movie Section -->
-    <div id="movies-container">
-        <div id="movies"></div>
+    <!-- Movie Grid -->
+    <main id="movies-container">
+        <div class="movie-grid" id="movies"></div>
         <div id="loading">Loading...</div>
-        <div id="error"></div>
+    </main>
+
+    <!-- Episodes Popup -->
+    <div id="episodes-popup" class="episodes-popup">
+        <h2 id="series-title"></h2>
+        <div id="episodes-list"></div>
+        <button id="close-popup">Close</button>
     </div>
 
     <script src="script.js"></script>
