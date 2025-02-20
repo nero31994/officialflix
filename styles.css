@@ -22,7 +22,7 @@ body {
     z-index: -1;
 }
 
-/* Top Menu */
+/* Sticky Top Menu */
 .top-menu {
     display: flex;
     justify-content: space-between;
@@ -32,6 +32,10 @@ body {
     border-radius: 12px;
     backdrop-filter: blur(10px);
     flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
 }
 
 /* Search Bar */
