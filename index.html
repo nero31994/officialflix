@@ -3,28 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NERO FLIX</title>
+    <title>Movie Site</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="background-overlay"></div>
-
-    <header class="top-menu">
-        <div class="search-container">
-            <input type="text" id="search" placeholder="Search movies..." onkeyup="debounceSearch()">
-        </div>
-        <nav class="categories">
-            <a href="#" onclick="fetchMovies('movie')">Movies</a>
-            <a href="#" onclick="fetchMovies('tv')">TV Series</a>
-            <a href="#" onclick="fetchMovies('anime')">Anime</a>
-        </nav>
+    <header>
+        <h1>Movie Site</h1>
+        <input type="text" id="search" placeholder="Search movies..." oninput="debounceSearch()">
     </header>
+
+    <nav class="categories">
+        <button onclick="fetchMovies('movie')">Movies</button>
+        <button onclick="fetchMovies('tv')">TV Series</button>
+        <button onclick="fetchMovies('anime')">Anime</button>
+    </nav>
+
+    <nav class="providers">
+        <button onclick="fetchMovies(currentCategory, 1, '', 8)">Netflix</button>
+        <button onclick="fetchMovies(currentCategory, 1, '', 119)">Prime Video</button>
+        <button onclick="fetchMovies(currentCategory, 1, '', 337)">Disney+</button>
+        <button onclick="fetchMovies(currentCategory, 1, '', 384)">Apple TV+</button>
+    </nav>
 
     <p id="loading" class="loading">Loading movies...</p>
     <div id="movies" class="grid"></div>
+    <button id="loadMore" onclick="loadMoreMovies()">Load More</button>
     <p id="error" class="error"></p>
-
-    <button id="load-more" class="load-more-btn">Load More</button>
 
     <script src="script.js"></script>
 </body>
