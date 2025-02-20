@@ -3,30 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie & TV Streaming</title>
+    <title>Movie Site</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
-        <img src="https://i.ibb.co/vxYGP3h8/Photoroom-20240720-094102.png" alt="Logo" class="logo">
-        <input type="text" id="search" placeholder="Search for movies, TV series, anime...">
+        <div class="logo-container">
+            <img src="https://i.ibb.co/vxYGP3h8/Photoroom-20240720-094102.png" alt="Logo">
+        </div>
+        <input type="text" id="search" placeholder="Search movies...">
+        <nav>
+            <ul>
+                <li><a href="#" onclick="fetchCategory('popular')">Popular</a></li>
+                <li><a href="#" onclick="fetchCategory('movie')">Movies</a></li>
+                <li><a href="#" onclick="fetchCategory('tv')">TV Series</a></li>
+                <li><a href="#" onclick="fetchCategory('anime')">Anime</a></li>
+            </ul>
+        </nav>
     </header>
 
-    <nav>
-        <button onclick="fetchMoviesByCategory('movie/popular')">Movies</button>
-        <button onclick="fetchMoviesByCategory('tv/popular')">TV Series</button>
-        <button onclick="fetchMoviesByCategory('anime')">Anime</button>
-    </nav>
-
-    <div id="movies"></div>
-    <div id="loading">Loading...</div>
-    <div id="error"></div>
-
-    <div id="episodes-modal" class="modal">
-        <div class="modal-content">
-            <span id="close-modal">&times;</span>
-            <div id="episodes-list"></div>
-        </div>
+    <div class="container">
+        <p id="loading" class="loading">Loading movies...</p>
+        <div id="movies" class="grid"></div>
+        <div id="episodes" class="episode-list"></div>
+        <p id="error" class="error"></p>
     </div>
 
     <script src="script.js"></script>
