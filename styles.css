@@ -1,4 +1,4 @@
-/* Global Styles */
+/* General Styles */
 body {
     font-family: Arial, sans-serif;
     background: rgba(18, 18, 18, 0.8);
@@ -6,9 +6,24 @@ body {
     text-align: center;
     margin: 0;
     padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    backdrop-filter: blur(10px);
+}
+
+/* Glassmorphism Effect */
+header {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 10px;
+    margin: 20px;
+    box-shadow: 0px 5px 15px rgba(255, 255, 255, 0.2);
+}
+
+/* Dark Mode Button */
+#darkModeToggle {
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
 }
 
 /* Search Bar */
@@ -17,30 +32,32 @@ body {
     max-width: 500px;
     padding: 12px;
     font-size: 16px;
-    border-radius: 10px;
+    border-radius: 5px;
     border: none;
     outline: none;
     margin: 20px 0;
+    box-shadow: 0px 0px 8px rgba(255, 255, 255, 0.2);
+}
+
+/* Category Tabs */
+nav {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.tab {
     background: rgba(255, 255, 255, 0.2);
-    color: white;
-    box-shadow: 0px 4px 12px rgba(255, 255, 255, 0.1);
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
     transition: 0.3s;
 }
 
-#search:focus {
-    box-shadow: 0px 0px 12px rgba(255, 255, 255, 0.3);
-}
-
-/* Category Titles */
-.category-title {
-    font-size: 22px;
-    font-weight: bold;
-    margin: 20px 0 10px;
-    text-transform: uppercase;
-    background: linear-gradient(45deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
-    padding: 8px 16px;
-    border-radius: 10px;
-    display: inline-block;
+.tab:hover {
+    background: rgba(255, 255, 255, 0.4);
 }
 
 /* Movie Grid */
@@ -48,42 +65,27 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 15px;
-    padding: 10px;
+    padding: 20px;
     max-width: 1200px;
     margin: auto;
 }
 
-/* Movie Card */
 .movie {
     position: relative;
     cursor: pointer;
-    border-radius: 12px;
-    overflow: hidden;
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s ease-in-out;
 }
 
 .movie:hover {
     transform: scale(1.08);
-    box-shadow: 0px 4px 15px rgba(255, 255, 255, 0.2);
 }
 
-/* Movie Images */
 .movie img {
     width: 100%;
-    height: 220px;
+    border-radius: 8px;
     object-fit: cover;
-    border-radius: 12px;
-    transition: opacity 0.3s;
 }
 
-.movie:hover img {
-    opacity: 0.7;
-}
-
-/* Overlay Title */
 .movie .overlay {
     position: absolute;
     bottom: 0;
@@ -93,7 +95,6 @@ body {
     color: white;
     padding: 8px;
     font-size: 14px;
-    text-align: center;
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
 }
@@ -102,34 +103,24 @@ body {
     opacity: 1;
 }
 
-/* Loading & Error Messages */
 .loading, .error {
     font-size: 18px;
     margin-top: 20px;
     color: #ff5757;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .grid {
-        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    }
-
-    .movie img {
-        height: 180px;
-    }
+/* Load More Button */
+#loadMore {
+    background: #ff5757;
+    color: white;
+    border: none;
+    padding: 10px;
+    margin: 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: none;
 }
 
-@media (max-width: 480px) {
-    .grid {
-        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-    }
-
-    .movie img {
-        height: 150px;
-    }
-
-    .category-title {
-        font-size: 18px;
-    }
+#loadMore:hover {
+    background: #ff4141;
 }
