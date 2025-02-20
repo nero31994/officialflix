@@ -34,7 +34,7 @@ export default async function handler(req, res) {
                     </style>
                 </head>
                 <body>
-                    <iframe id="vidsrc-frame" src="${embedUrl}" autofullscreen sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
+                    <iframe id="vidsrc-frame" src="${embedUrl}" allowfullscreen sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
                     <script>
                         setInterval(() => {
                             try {
