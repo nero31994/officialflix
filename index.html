@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Streaming</title>
+    <title>Movie Stream</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Top Menu (Fixed) -->
-    <header class="top-menu">
-        <div class="logo-container">
-            <img src="https://i.ibb.co/vxYGP3h8/Photoroom-20240720-094102.png" alt="Logo" class="logo">
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <img src="https://i.ibb.co/vxYGP3h8/Photoroom-20240720-094102.png" alt="Logo">
         </div>
         <div class="search-container">
             <input type="text" id="search" placeholder="Search movies...">
@@ -19,18 +19,11 @@
         </div>
     </header>
 
-    <!-- Movie Grid -->
-    <main id="movies-container">
-        <div class="movie-grid" id="movies"></div>
-        <div id="loading">Loading...</div>
-    </main>
+    <!-- Loading Indicator -->
+    <div id="loading">Loading...</div>
 
-    <!-- Episodes Popup -->
-    <div id="episodes-popup" class="episodes-popup">
-        <h2 id="series-title"></h2>
-        <div id="episodes-list"></div>
-        <button id="close-popup">Close</button>
-    </div>
+    <!-- Movies Grid -->
+    <div id="movies" class="movies-container"></div>
 
     <script src="script.js"></script>
 </body>
