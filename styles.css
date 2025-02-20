@@ -1,9 +1,11 @@
 /* General Styles */
 body {
     margin: 0;
+    padding: 0;
     font-family: Arial, sans-serif;
     background: url("https://i.ibb.co/X3Qv7dn/giphy.gif") no-repeat center center fixed;
     background-size: cover;
+    color: white;
 }
 
 /* Top Menu */
@@ -12,7 +14,7 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 10px 20px;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.8);
     position: fixed;
     top: 0;
     width: 100%;
@@ -25,27 +27,31 @@ body {
     align-items: center;
 }
 #logo {
-    height: 35px;
+    height: 40px;
     width: auto;
-    margin-right: 15px;
+    margin-right: 10px;
 }
 
 /* Search Bar */
 #search-container {
     display: flex;
     align-items: center;
-    flex-grow: 1;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 5px;
+    border-radius: 10px;
     max-width: 400px;
+    width: 100%;
 }
-
 #search {
     flex: 1;
     padding: 8px;
     border: none;
     border-radius: 5px;
     font-size: 16px;
+    background: transparent;
+    color: white;
+    outline: none;
 }
-
 #search-btn {
     padding: 8px 12px;
     border: none;
@@ -53,78 +59,43 @@ body {
     color: white;
     cursor: pointer;
     border-radius: 5px;
+    font-size: 14px;
     margin-left: 5px;
 }
 
-/* 🔥 Fixing Movie Grid 🔥 */
-#movies {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 15px;
-    padding: 80px 20px 20px;
-}
-
-/* Fixing Movie Poster Scaling */
-.movie img {
-    width: 100%;   /* Ensures images fill the container */
-    height: auto;  /* Prevents distortion */
-    border-radius: 8px;
-    transition: transform 0.2s ease-in-out;
-}
-
-/* Hover Effect */
-.movie:hover img {
-    transform: scale(1.05);
-}
-
-/* Overlay Effect */
-.overlay {
-    position: absolute;
-    bottom: 10px;
-    left: 0;
-    right: 0;
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 5px;
-    text-align: center;
-    font-size: 14px;
-}
-
-/* 🔥 Fixing Episode Popup 🔥 */
-#episode-popup {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    max-width: 600px;
-    background: rgba(0, 0, 0, 0.9);
-    color: white;
+/* Movies Container */
+#movies-container {
+    margin-top: 80px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-    overflow-y: auto; /* Makes it scrollable */
-    max-height: 80vh; /* Prevents it from being too large */
 }
 
-/* Close Button */
-#close-popup {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 24px;
-    cursor: pointer;
+/* Movie Cards */
+.movie {
+    width: 200px;
+    margin: 10px;
+    position: relative;
+    transition: transform 0.3s ease-in-out;
+}
+.movie img {
+    width: 100%;
+    border-radius: 10px;
+    transition: transform 0.3s ease-in-out;
+}
+.movie:hover {
+    transform: scale(1.1);
 }
 
-/* Adjustments for Smaller Screens */
-@media (max-width: 600px) {
+/* Responsive Fixes */
+@media (max-width: 768px) {
     #top-menu {
         flex-direction: column;
         padding: 10px;
     }
     #search-container {
-        width: 100%;
+        max-width: 100%;
         margin-top: 5px;
     }
 }
