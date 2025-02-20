@@ -35,10 +35,16 @@ function displayMovies(movies) {
         const movieEl = document.createElement("div");
         movieEl.classList.add("movie");
         movieEl.innerHTML = `
-            <img src="${IMG_URL}${movie.poster_path}" alt="${movie.title}">
-            <div class="overlay">${movie.title}</div>
+            <img src="${IMG_URL}${movie.poster_path}" alt="${movie.title || movie.name}">
+            <div class="overlay">${movie.title || movie.name}</div>
         `;
-        movieEl.onclick = () => movie.type === "tv" ? fetchEpisodes(movie.id) : openMovie(movie.id);
+        movieEl.onclick = () => {
+            if (category === "tv") {
+                fetchEpisodes(movie.id);
+            } else {
+                openMovie(movie.id);
+            }
+        };
         moviesDiv.appendChild(movieEl);
     });
 }
@@ -46,16 +52,22 @@ function displayMovies(movies) {
 function fetchEpisodes(tvId) {
     document.getElementById("episodes").innerHTML = "<p>Loading episodes...</p>";
 
-    fetch(`https://api.themoviedb.org/3/tv/${tvId}/season/1?api_key=${API_KEY}`)
+    fetch(`https://api.themoviedb.org/3/tv/${tvId}/seasons?api_key=${API_KEY}`)
         .then(res => res.json())
         .then(data => {
-            document.getElementById("episodes").innerHTML = "";
-            data.episodes.forEach(ep => {
-                const epDiv = document.createElement("div");
-                epDiv.classList.add("episode");
-                epDiv.innerText = `Episode ${ep.episode_number}: ${ep.name}`;
-                epDiv.onclick = () => openMovie(tvId, ep.episode_number);
-                document.getElementById("episodes").appendChild(epDiv);
+            document.getElementById("episodes").innerHTML = "<h3>Episodes:</h3>";
+            data.seasons.forEach(season => {
+                fetch(`https://api.themoviedb.org/3/tv/${tvId}/season/${season.season_number}?api_key=${API_KEY}`)
+                    .then(res => res.json())
+                    .then(seasonData => {
+                        seasonData.episodes.forEach(ep => {
+                            const epDiv = document.createElement("div");
+                            epDiv.classList.add("episode");
+                            epDiv.innerText = `S${season.season_number}E${ep.episode_number}: ${ep.name}`;
+                            epDiv.onclick = () => openMovie(tvId, season.season_number, ep.episode_number);
+                            document.getElementById("episodes").appendChild(epDiv);
+                        });
+                    });
             });
         })
         .catch(() => document.getElementById("episodes").innerText = "Error loading episodes.");
@@ -65,6 +77,8 @@ function fetchCategory(type) {
     category = type;
     page = 1;
     document.getElementById("movies").innerHTML = "";
+    document.getElementById("episodes").innerHTML = "";
+
     if (type === 'anime') {
         fetchMovies(`https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&with_genres=16`);
     } else if (type === 'tv') {
@@ -74,9 +88,9 @@ function fetchCategory(type) {
     }
 }
 
-function openMovie(id, episode = null) {
+function openMovie(id, season = null, episode = null) {
     let url = `${PROXY_URL}${id}`;
-    if (episode) url += `&episode=${episode}`;
+    if (season && episode) url += `&season=${season}&episode=${episode}`;
     window.open(url, "_blank");
 }
 
