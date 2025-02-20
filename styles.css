@@ -1,4 +1,4 @@
-/* General Styles */
+/* Reset Styles */
 * {
     margin: 0;
     padding: 0;
@@ -13,7 +13,7 @@ body {
     overflow-x: hidden;
 }
 
-/* Top Menu */
+/* Fixed Top Menu */
 .top-menu {
     display: flex;
     align-items: center;
@@ -21,7 +21,7 @@ body {
     position: fixed;
     top: 0;
     width: 100%;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.8);
     padding: 10px 20px;
     z-index: 1000;
     height: 60px;
@@ -35,7 +35,6 @@ body {
 
 .logo {
     height: 40px;
-    margin-right: 15px;
 }
 
 /* Search Bar */
@@ -44,7 +43,6 @@ body {
     align-items: center;
     flex-grow: 1;
     max-width: 500px;
-    position: relative;
 }
 
 #search {
