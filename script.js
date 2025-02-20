@@ -3,49 +3,58 @@ const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 const PROXY_URL = '/api/proxy?id=';
 let timeout = null;
 let page = 1;
-let category = 'popular';
 
-async function fetchMovies(url) {
+async function fetchAllContent() {
     document.getElementById("loading").style.display = "block";
+    
     try {
-        const res = await fetch(url);
-        const data = await res.json();
+        const [moviesRes, tvRes, animeRes] = await Promise.all([
+            fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&page=${page}`),
+            fetch(`https://api.themoviedb.org/3/tv/popular?api_key=${API_KEY}&page=${page}`),
+            fetch(`https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&with_genres=16&page=${page}`)
+        ]);
+
+        const [movies, tvShows, anime] = await Promise.all([
+            moviesRes.json(),
+            tvRes.json(),
+            animeRes.json()
+        ]);
+
         document.getElementById("loading").style.display = "none";
 
-        if (!data.results || data.results.length === 0) {
-            document.getElementById("error").innerText = "No movies found!";
+        if (!movies.results.length && !tvShows.results.length && !anime.results.length) {
+            document.getElementById("error").innerText = "No content found!";
             return;
         }
 
         document.getElementById("error").innerText = "";
-        displayMovies(data.results);
+        displayContent([...movies.results, ...tvShows.results, ...anime.results]);
     } catch (err) {
-        document.getElementById("error").innerText = "Error fetching movies!";
+        document.getElementById("error").innerText = "Error fetching content!";
         document.getElementById("loading").style.display = "none";
     }
 }
 
-function displayMovies(movies) {
+function displayContent(contentList) {
     const moviesDiv = document.getElementById("movies");
-    moviesDiv.innerHTML = "";
 
-    movies.forEach(movie => {
-        if (!movie.poster_path) return;
+    contentList.forEach(item => {
+        if (!item.poster_path) return;
 
-        const movieEl = document.createElement("div");
-        movieEl.classList.add("movie");
-        movieEl.innerHTML = `
-            <img src="${IMG_URL}${movie.poster_path}" alt="${movie.title || movie.name}">
-            <div class="overlay">${movie.title || movie.name}</div>
+        const contentEl = document.createElement("div");
+        contentEl.classList.add("movie");
+        contentEl.innerHTML = `
+            <img src="${IMG_URL}${item.poster_path}" alt="${item.title || item.name}">
+            <div class="overlay">${item.title || item.name}</div>
         `;
-        movieEl.onclick = () => {
-            if (category === "tv") {
-                fetchEpisodes(movie.id);
+        contentEl.onclick = () => {
+            if (item.media_type === "tv" || item.name) {
+                fetchEpisodes(item.id);
             } else {
-                openMovie(movie.id);
+                openMovie(item.id);
             }
         };
-        moviesDiv.appendChild(movieEl);
+        moviesDiv.appendChild(contentEl);
     });
 }
 
@@ -93,33 +102,19 @@ async function fetchSeasonEpisodes(tvId, seasonNumber) {
     }
 }
 
-function fetchCategory(type) {
-    category = type;
-    page = 1;
-    document.getElementById("movies").innerHTML = "";
-    document.getElementById("episodes").innerHTML = "";
-
-    if (type === 'anime') {
-        fetchMovies(`https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&with_genres=16`);
-    } else if (type === 'tv') {
-        fetchMovies(`https://api.themoviedb.org/3/tv/popular?api_key=${API_KEY}`);
-    } else {
-        fetchMovies(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`);
-    }
-}
-
 function openMovie(id, season = null, episode = null) {
     let url = `${PROXY_URL}${id}`;
     if (season && episode) url += `&season=${season}&episode=${episode}`;
     window.open(url, "_blank");
 }
 
+// Infinite Scroll
 window.addEventListener("scroll", () => {
     if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 50) {
         page++;
-        let url = `https://api.themoviedb.org/3/${category === 'tv' ? 'tv' : 'movie'}/popular?api_key=${API_KEY}&page=${page}`;
-        fetchMovies(url);
+        fetchAllContent();
     }
 });
 
-fetchMovies(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`);
+// Load all content on page load
+fetchAllContent();
