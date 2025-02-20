@@ -1,14 +1,17 @@
 const API_KEY = '488eb36776275b8ae18600751059fb49';
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-const PROXY_URL = 'https://officialflix.vercel.app/api/proxy?id=';
+const PROXY_URL = '/api/proxy?id=';
 let currentCategory = 'movie';
 let currentPage = 1;
+let timeout = null;
 
-async function fetchMovies(category, page = 1) {
+async function fetchMovies(category, page = 1, searchQuery = "") {
     document.getElementById("loading").style.display = "block";
     let url = '';
 
-    if (category === 'movie') {
+    if (searchQuery) {
+        url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${searchQuery}&page=${page}`;
+    } else if (category === 'movie') {
         url = `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&page=${page}`;
     } else if (category === 'tv') {
         url = `https://api.themoviedb.org/3/tv/popular?api_key=${API_KEY}&page=${page}`;
@@ -52,6 +55,14 @@ function displayMovies(movies, clear = false) {
         movieEl.onclick = () => window.open(`${PROXY_URL}${movie.id}`, "_blank");
         moviesDiv.appendChild(movieEl);
     });
+}
+
+function debounceSearch() {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+        const query = document.getElementById("search").value;
+        fetchMovies(currentCategory, 1, query);
+    }, 300);
 }
 
 document.getElementById("load-more").addEventListener("click", () => {
