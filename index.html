@@ -3,32 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Hub</title>
+    <title>Movie Site</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <!-- Top Navigation Bar -->
-    <header id="top-menu">
+    <!-- Top Menu -->
+    <div id="top-menu">
         <div class="logo-container">
-            <img src="https://i.ibb.co/vxYGP3h8/Photoroom-20240720-094102.png" id="logo" alt="Logo">
+            <img id="logo" src="https://i.ibb.co/vxYGP3h8/Photoroom-20240720-094102.png" alt="Logo">
         </div>
         <div id="search-container">
-            <input type="text" id="search" placeholder="Search movies...">
-            <button id="search-btn">Search</button>
+            <input type="text" id="search" placeholder="Search...">
+            <button id="search-btn">🔍</button>
         </div>
-    </header>
+    </div>
 
-    <!-- Movie Grid -->
-    <div id="movies"></div>
-
-    <!-- Episode Popup -->
-    <div id="episode-popup" class="hidden">
-        <div id="popup-content">
-            <span id="close-popup">&times;</span>
-            <h2 id="series-title"></h2>
-            <div id="episodes"></div>
-        </div>
+    <!-- Movie Section -->
+    <div id="movies-container">
+        <div id="movies"></div>
+        <div id="loading">Loading...</div>
+        <div id="error"></div>
     </div>
 
     <script src="script.js"></script>
