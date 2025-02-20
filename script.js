@@ -16,16 +16,15 @@ async function fetchMovies(category = 'movie', page = 1, searchQuery = "", provi
 
     if (searchQuery) {
         url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${searchQuery}&page=${page}`;
-    } else if (category === 'movie') {
-        url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&page=${page}`;
-    } else if (category === 'tv') {
-        url = `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&page=${page}`;
-    } else if (category === 'anime') {
-        url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=16&page=${page}`;
+    } else {
+        url = `https://api.themoviedb.org/3/discover/${category}?api_key=${API_KEY}&page=${page}`;
+        if (category === 'anime') {
+            url += `&with_genres=16`; // Anime genre filtering
+        }
     }
 
     if (providerID) {
-        url += `&with_watch_providers=${providerID}&watch_region=US`;
+        url += `&with_watch_providers=${providerID}&watch_region=US`; // Apply streaming provider filter
     }
 
     try {
@@ -74,4 +73,5 @@ function debounceSearch() {
     }, 300);
 }
 
+// Load default movies on page load
 fetchMovies();
