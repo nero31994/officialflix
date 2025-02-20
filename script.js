@@ -1,11 +1,11 @@
 const API_KEY = '488eb36776275b8ae18600751059fb49'; // Replace with your TMDB API key
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-const PROXY_URL = 'https://officialflix.vercel.app/api/proxy?id='; // Proxy route on Vercel
+const PROXY_URL = '/api/proxy?id='; // Proxy route on Vercel
 let page = 1;
 let category = 'movie';
 let loading = false;
 
-// Fetch Movies or TV Shows
+// Fetch Movies, TV Shows, or Anime
 async function fetchMovies(type = 'movie', reset = false) {
     if (loading) return;
     loading = true;
@@ -21,9 +21,11 @@ async function fetchMovies(type = 'movie', reset = false) {
     try {
         let url;
         if (type === 'anime') {
-            url = `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&with_genres=16&page=${page}`; // Anime genre (16)
+            url = `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&with_genres=16&page=${page}`; // Anime Genre (16)
+        } else if (type === 'tv') {
+            url = `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&sort_by=popularity.desc&page=${page}`;
         } else {
-            url = `https://api.themoviedb.org/3/discover/${type}?api_key=${API_KEY}&page=${page}`;
+            url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&sort_by=popularity.desc&page=${page}`;
         }
 
         const res = await fetch(url);
@@ -60,7 +62,7 @@ function displayMovies(movies, type) {
             <div class="overlay">${movie.title || movie.name}</div>
         `;
         
-        if (type === 'tv') {
+        if (type === 'tv' || type === 'anime') {
             movieEl.onclick = () => fetchEpisodes(movie.id);
         } else {
             movieEl.onclick = () => window.open(`${PROXY_URL}${movie.id}`, "_blank");
@@ -73,24 +75,24 @@ function displayMovies(movies, type) {
 // Fetch Episodes for TV Shows
 async function fetchEpisodes(tvId) {
     try {
-        const res = await fetch(`https://api.themoviedb.org/3/tv/${tvId}/seasons?api_key=${API_KEY}`);
+        const res = await fetch(`https://api.themoviedb.org/3/tv/${tvId}?api_key=${API_KEY}`);
         const data = await res.json();
 
-        if (!data || data.length === 0) {
-            document.getElementById("error").innerText = "No episodes found!";
+        if (!data.seasons || data.seasons.length === 0) {
+            document.getElementById("error").innerText = "No seasons found!";
             return;
         }
 
-        displayEpisodes(tvId, data);
+        displaySeasons(tvId, data.seasons);
     } catch (err) {
-        document.getElementById("error").innerText = "Error fetching episodes!";
+        document.getElementById("error").innerText = "Error fetching seasons!";
     }
 }
 
-// Display TV Show Episodes
-function displayEpisodes(tvId, seasons) {
+// Display TV Show Seasons
+function displaySeasons(tvId, seasons) {
     const moviesDiv = document.getElementById("movies");
-    moviesDiv.innerHTML = ''; // Clear movies and show episodes instead
+    moviesDiv.innerHTML = ''; // Clear and show seasons
 
     seasons.forEach(season => {
         if (!season.poster_path) return;
@@ -107,7 +109,7 @@ function displayEpisodes(tvId, seasons) {
     });
 }
 
-// Fetch and Display Specific Season Episodes
+// Fetch and Display Season Episodes
 async function fetchSeasonEpisodes(tvId, seasonNumber) {
     try {
         const res = await fetch(`https://api.themoviedb.org/3/tv/${tvId}/season/${seasonNumber}?api_key=${API_KEY}`);
