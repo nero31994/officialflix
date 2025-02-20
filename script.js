@@ -49,28 +49,48 @@ function displayMovies(movies) {
     });
 }
 
-function fetchEpisodes(tvId) {
+async function fetchEpisodes(tvId) {
     document.getElementById("episodes").innerHTML = "<p>Loading episodes...</p>";
 
-    fetch(`https://api.themoviedb.org/3/tv/${tvId}/seasons?api_key=${API_KEY}`)
-        .then(res => res.json())
-        .then(data => {
-            document.getElementById("episodes").innerHTML = "<h3>Episodes:</h3>";
-            data.seasons.forEach(season => {
-                fetch(`https://api.themoviedb.org/3/tv/${tvId}/season/${season.season_number}?api_key=${API_KEY}`)
-                    .then(res => res.json())
-                    .then(seasonData => {
-                        seasonData.episodes.forEach(ep => {
-                            const epDiv = document.createElement("div");
-                            epDiv.classList.add("episode");
-                            epDiv.innerText = `S${season.season_number}E${ep.episode_number}: ${ep.name}`;
-                            epDiv.onclick = () => openMovie(tvId, season.season_number, ep.episode_number);
-                            document.getElementById("episodes").appendChild(epDiv);
-                        });
-                    });
-            });
-        })
-        .catch(() => document.getElementById("episodes").innerText = "Error loading episodes.");
+    try {
+        const res = await fetch(`https://api.themoviedb.org/3/tv/${tvId}?api_key=${API_KEY}`);
+        const data = await res.json();
+
+        if (!data.seasons || data.seasons.length === 0) {
+            document.getElementById("episodes").innerText = "No episodes available.";
+            return;
+        }
+
+        document.getElementById("episodes").innerHTML = "<h3>Episodes:</h3>";
+
+        for (const season of data.seasons) {
+            if (season.season_number === 0) continue; // Skip specials
+            await fetchSeasonEpisodes(tvId, season.season_number);
+        }
+    } catch (err) {
+        document.getElementById("episodes").innerText = "Error loading episodes.";
+    }
+}
+
+async function fetchSeasonEpisodes(tvId, seasonNumber) {
+    try {
+        const res = await fetch(`https://api.themoviedb.org/3/tv/${tvId}/season/${seasonNumber}?api_key=${API_KEY}`);
+        const seasonData = await res.json();
+
+        const seasonTitle = document.createElement("h4");
+        seasonTitle.innerText = `Season ${seasonNumber}`;
+        document.getElementById("episodes").appendChild(seasonTitle);
+
+        seasonData.episodes.forEach(ep => {
+            const epDiv = document.createElement("div");
+            epDiv.classList.add("episode");
+            epDiv.innerText = `E${ep.episode_number}: ${ep.name}`;
+            epDiv.onclick = () => openMovie(tvId, seasonNumber, ep.episode_number);
+            document.getElementById("episodes").appendChild(epDiv);
+        });
+    } catch (err) {
+        console.error(`Error fetching Season ${seasonNumber} episodes:`, err);
+    }
 }
 
 function fetchCategory(type) {
