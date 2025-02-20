@@ -1,67 +1,78 @@
-const API_KEY = '488eb36776275b8ae18600751059fb49';
-const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-const PROXY_URL = 'https://officialflix.vercel.app/api/proxy?id='; // Proxy route on Vercel
-let page = 1;
-let query = "";
-
-// Load movies on scroll
-window.addEventListener('scroll', () => {
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
-        loadMovies();
-    }
-});
-
-// Fetch movies
-async function loadMovies() {
-    try {
-        let url = query
-            ? `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${query}&page=${page}`
-            : `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&page=${page}`;
-
-        const res = await fetch(url);
-        const data = await res.json();
-        displayMovies(data.results);
-        page++;
-    } catch (error) {
-        console.error("Error loading movies:", error);
-    }
+/* General Styles */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: url("https://i.ibb.co/X3Qv7dn/giphy.gif") no-repeat center center fixed;
+    background-size: cover;
 }
 
-// Display movies
-function displayMovies(movies) {
-    const moviesDiv = document.getElementById("movies");
-    
-    movies.forEach(movie => {
-        if (!movie.poster_path) return;
-
-        const movieEl = document.createElement("div");
-        movieEl.classList.add("movie");
-        movieEl.innerHTML = `
-            <img src="${IMG_URL}${movie.poster_path}" alt="${movie.title}" loading="lazy">
-            <div class="overlay">${movie.title}</div>
-        `;
-
-        movieEl.onclick = () => {
-            if (movie.media_type === "tv") {
-                showEpisodePopup(movie.id, movie.name || movie.title);
-            } else {
-                window.open(`${PROXY_URL}${movie.id}`, "_blank");
-            }
-        };
-
-        moviesDiv.appendChild(movieEl);
-    });
+/* Top Menu Bar */
+#top-menu {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.7);
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 100;
 }
 
-// Search Functionality
-document.getElementById("search-btn").addEventListener("click", () => {
-    query = document.getElementById("search").value.trim();
-    if (query.length > 2) {
-        document.getElementById("movies").innerHTML = "";
-        page = 1;
-        loadMovies();
-    }
-});
+/* Logo */
+#logo {
+    height: 40px;
+    width: auto;
+    margin-right: 15px;
+}
 
-// Load movies on page load
-loadMovies();
+/* Search Bar */
+#search-container {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    max-width: 400px;
+}
+
+#search {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+#search-btn {
+    padding: 8px 12px;
+    border: none;
+    background: #ff3d00;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-left: 5px;
+}
+
+#search-btn:hover {
+    background: #e63600;
+}
+
+/* Movie Grid */
+#movies {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    padding: 80px 20px 20px;
+}
+
+/* Adjustments for Smaller Screens */
+@media (max-width: 600px) {
+    #top-menu {
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    #search-container {
+        width: 100%;
+        margin-top: 5px;
+    }
+}
