@@ -6,10 +6,9 @@ body {
     background: url('https://i.ibb.co/X3Qv7dn/giphy.gif') no-repeat center center fixed;
     background-size: cover;
     color: white;
-    overflow-x: hidden;
 }
 
-/* Top Navigation */
+/* Top Menu */
 .top-menu {
     display: flex;
     align-items: center;
@@ -22,23 +21,30 @@ body {
     z-index: 1000;
 }
 
-.logo {
-    height: 40px;
-    margin-right: 10px;
+/* Logo */
+.logo-container {
+    display: flex;
+    align-items: center;
 }
 
+.logo {
+    height: 40px;
+    margin-right: 15px;
+}
+
+/* Search Bar */
 .search-container {
     display: flex;
     align-items: center;
-    width: 100%;
-    max-width: 400px;
+    flex-grow: 1;
+    max-width: 500px;
 }
 
 #search {
     flex: 1;
     padding: 8px;
     border: none;
-    border-radius: 5px;
+    border-radius: 5px 0 0 5px;
 }
 
 #search-btn {
@@ -47,55 +53,76 @@ body {
     padding: 8px 15px;
     border: none;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 0 5px 5px 0;
 }
 
 /* Movie Grid */
-#movies {
+.movie-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 15px;
-    padding: 100px 20px 20px;
-    justify-items: center;
+    padding: 80px 20px 20px;
 }
 
 /* Movie Cards */
 .movie {
     position: relative;
-    width: 100%;
-    max-width: 180px;
-    border-radius: 10px;
     overflow: hidden;
+    border-radius: 15px;
     transition: transform 0.3s ease;
-}
-
-.movie img {
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
+    backdrop-filter: blur(10px);
 }
 
 .movie:hover {
     transform: scale(1.05);
 }
 
+.movie img {
+    width: 100%;
+    height: auto;
+    border-radius: 15px;
+}
+
+/* Overlay Effect */
 .overlay {
     position: absolute;
     bottom: 0;
-    left: 0;
-    width: 100%;
     background: rgba(0, 0, 0, 0.7);
     color: white;
+    width: 100%;
     text-align: center;
     padding: 5px;
-    font-size: 14px;
 }
 
-/* Responsive Design */
+/* Episodes Popup */
+.episodes-popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-height: 80%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(15px);
+    padding: 20px;
+    border-radius: 10px;
+    overflow-y: auto;
+    z-index: 2000;
+}
+
+/* Responsive */
 @media (max-width: 600px) {
     .top-menu {
-        flex-direction: column;
-        padding: 10px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .logo-container {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 10px;
     }
 
     .search-container {
@@ -103,7 +130,7 @@ body {
         max-width: 100%;
     }
 
-    #movies {
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    .movie-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     }
 }
