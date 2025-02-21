@@ -29,7 +29,7 @@ export default async function handler(req, res) {
                 <head>
                     <meta name="viewport" content="width=device-width, initial-scale=1">
                     <style>
-                        body { margin: 0; background: black; display: flex; justify-content: center; align-items: center; height: 90vh; }
+                        body { margin: 0; background: black; display: flex; justify-content: center; align-items: center; height: 100vh; }
                         iframe { width: 100%; height: 100vh; border: none; }
                     </style>
                 </head>
