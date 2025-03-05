@@ -1,25 +1,28 @@
 export default async function handler(req, res) {
-    const { id } = req.query;
+    const { id, type } = req.query;
 
     if (!id || isNaN(id)) {
-        return res.status(400).json({ error: "Invalid Movie ID" });
+        return res.status(400).json({ error: "Invalid ID" });
     }
 
-    const vidSrcUrl = `https://vidsrc.xyz/embed/movie/${id}`;
+    // Determine whether the request is for a movie or an episode
+    const baseEmbedUrl = type === "episode" 
+        ? `https://vidsrc.xyz/embed/tv/${id}`
+        : `https://vidsrc.xyz/embed/movie/${id}`;
 
     try {
-        const response = await fetch(vidSrcUrl);
+        const response = await fetch(baseEmbedUrl);
         let html = await response.text();
 
-        // Remove only ad-related scripts while keeping player scripts
-        html = html.replace(/<script[^>]*(ads|popunder|googletag|analytics|tracking)[^>]*>[\s\S]*?<\/script>/gi, ""); // Block known ad scripts
+        // ✅ Remove intrusive ad scripts but keep player scripts
+        html = html.replace(/<script[^>]*(ads|popunder|googletag|analytics|tracking)[^>]*>[\s\S]*?<\/script>/gi, "");
 
-        // Remove forced redirects
-        html = html.replace(/window\.open/g, "console.log"); // Disable pop-ups
-        html = html.replace(/location\.href/g, "console.log"); // Disable forced redirects
-        html = html.replace(/<a[^>]+target=["']_blank["'][^>]*>/gi, ""); // Remove forced new tabs
+        // ✅ Prevent forced redirects & pop-ups
+        html = html.replace(/window\.open/g, "console.log"); 
+        html = html.replace(/location\.href/g, "console.log"); 
+        html = html.replace(/<a[^>]+target=["']_blank["'][^>]*>/gi, ""); 
 
-        // Extract only the main video player iframe
+        // ✅ Extract main video player iframe
         const match = html.match(/<iframe[^>]+src="([^"]+)"/);
         if (match && match[1]) {
             const embedUrl = match[1];
@@ -36,13 +39,14 @@ export default async function handler(req, res) {
                 <body>
                     <iframe id="vidsrc-frame" src="${embedUrl}" allowfullscreen sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
                     <script>
+                        // ✅ Remove intrusive elements inside the iframe dynamically
                         setInterval(() => {
                             try {
                                 const iframe = document.getElementById("vidsrc-frame");
                                 if (iframe && iframe.contentWindow) {
                                     const iframeDoc = iframe.contentWindow.document;
-                                    
-                                    // Remove ad pop-ups dynamically
+
+                                    // Remove ads, popups, overlays, and hidden elements
                                     iframeDoc.querySelectorAll("a, script[src*='ads'], div[class*='ad'], iframe[src*='ads']").forEach(el => el.remove());
                                 }
                             } catch (err) {
